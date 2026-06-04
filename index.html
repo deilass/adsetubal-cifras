@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cifras & 3 Setlists da Banda</title>
+    <style>
+        :root { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --accent: #00adb5; --chord: #ffde7d; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; gap: 20px; }
+        h1, h2, h3 { color: #fff; margin-top: 0; }
+        .sidebar { width: 320px; background: var(--card); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; }
+        .main-content { flex: 1; background: var(--card); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .song-item { padding: 10px; background: #2d2d2d; margin-bottom: 8px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .song-item:hover { background: #3d3d3d; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 10px; background: #2a2a2a; padding: 5px; border-radius: 4px; }
+        .tab-btn { flex: 1; background: transparent; color: #aaa; border: none; padding: 6px; cursor: pointer; font-size: 12px; }
+        .tab-btn.active { background: var(--accent); color: white; border-radius: 4px; font-weight: bold; }
+        button { background: var(--accent); border: none; color: white; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { opacity: 0.9; }
+        .select-setlist-add { background: #333; color: white; border: 1px solid #555; padding: 4px; border-radius: 4px; font-size: 12px; }
+        .btn-danger { background: #ff414d; }
+        .btn-share { background: #28a745; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; }
+        .cifra-box { white-space: pre-wrap; font-family: monospace; font-size: 16px; line-height: 1.6; background: #1a1a1a; padding: 20px; border-radius: 6px; border: 1px solid #333; margin-top: 15px; }
+        .chord { color: var(--chord); font-weight: bold; }
+        .controls { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
+        .list-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA LATERAL GESTÃO -->
+    <div class="sidebar">
+        <div>
+            <h2>1. Repositório</h2>
+            <div id="lista-disponiveis" class="list-container">A carregar...</div>
+        </div>
+
+        <div style="border-top: 1px solid #444; padding-top: 15px;">
+            <h2>2. Setlists</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="mudarTabSetlist(1)">Lista 1</button>
+                <button class="tab-btn" onclick="mudarTabSetlist(2)">Lista 2</button>
+                <button class="tab-btn" onclick="mudarTabSetlist(3)">Lista 3</button>
+            </div>
+            <div id="lista-setlist" class="list-container"></div>
+            <button class="btn-share" onclick="gerarLinkPartilha()">🔗 Partilhar esta Setlist</button>
+        </div>
+    </div>
+
+    <!-- ÁREA DA CIFRA -->
+    <div class="main-content">
+        <h1 id="musica-titulo">Seleciona uma música</h1>
+        <div class="controls" id="controlos-transpose" style="display:none;">
+            <span>Tom Atual: <strong id="tom-atual" style="color:var(--chord);">Original</strong></span>
+            <button onclick="mudarTom(-1)">Semitom -</button>
+            <button onclick="mudarTom(1)">Semitom +</button>
+            <button class="btn-danger" onclick="removerDaSetlist()" id="btn-remover-setlist">Remover da Setlist</button>
+        </div>
+        <div class="cifra-box" id="cifra-corpo">Escolhe uma música na barra lateral.</div>
+    </div>
+
+    <script>
+        let bancoMusicas = {};
+        const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        
+        // Estrutura para 3 setlists independentes
+        let setlists = { 1: [], 2: [], 3: [] }; 
+        let setlistAtiva = 1;
+        let musicaAtualId = null;
+
+        window.onload = function() {
+            fetch('musicas.json')
+                .then(r => r.json())
+                .then(data => {
+                    bancoMusicas = data;
+                    renderizarDisponiveis();
+                    lerParametrosURL();
+                })
+                .catch(() => {
+                    document.getElementById("lista-disponiveis").innerText = "Erro ao carregar o ficheiro musicas.json";
+                });
+        };
+
+        function lerParametrosURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const listaParam = urlParams.get('l'); // Qual a lista activa (1, 2 ou 3)
+            const dadosParam = urlParams.get('d'); // Músicas e tons ex: musica1:2,musica2:-1
+
+            if (listaParam && dadosParam) {
+                setlistAtiva = parseInt(listaParam);
+                setlists[setlistAtiva] = dadosParam.split(',').map(item => {
+                    const [id, deslocamento] = item.split(':');
+                    return { id, tomDeslocamento: parseInt(deslocamento) };
+                });
+                
+                // Atualizar o visual dos botões das tabs
+                document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                    btn.classList.toggle('active', idx + 1 === setlistAtiva);
+                });
+
+                renderizarSetlist();
+                if(setlists[setlistAtiva].length > 0) carregarMusica(setlists[setlistAtiva][0].id, true);
+            } else {
+                renderizarSetlist();
+            }
+        }
+
+        function renderizarDisponiveis() {
+            const div = document.getElementById("lista-disponiveis");
+            div.innerHTML = "";
+            Object.keys(bancoMusicas).forEach(id => {
+                div.innerHTML += `
+                    <div class="song-item" onclick="carregarMusica('${id}', false)">
+                        <span>${bancoMusicas[id].titulo}</span>
+                        <select class="select-setlist-add" onclick="event.stopPropagation()" onchange="adicionarÀSetlist('${id}', this)">
+                            <option value="">+ Add...</option>
+                            <option value="1">Lista 1</option>
+                            <option value="2">Lista 2</option>
+                            <option value="3">Lista 3</option>
+                        </select>
+                    </div>`;
+            });
+        }
+
+        function renderizarSetlist() {
+            const div = document.getElementById("lista-setlist");
+            div.innerHTML = "";
+            const lista = setlists[setlistAtiva];
+            
+            if(lista.length === 0) {
+                div.innerHTML = "<p style='color:#666; font-size:12px;'>Esta lista está vazia.</p>";
+                return;
+            }
+
+            lista.forEach((item, index) => {
+                const info = bancoMusicas[item.id];
+                if (!info) return;
+                const tomCalculado = obterNomeTom(info.tomOriginal, item.tomDeslocamento);
+                div.innerHTML += `
+                    <div class="song-item" onclick="carregarMusica('${item.id}', true)">
+                        <span>${index + 1}. ${info.titulo} (<strong>${tomCalculado}</strong>)</span>
+                    </div>`;
+            });
+        }
+
+        function mudarTabSetlist(num) {
+            setlistAtiva = num;
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx + 1 === num);
+            });
+            renderizarSetlist();
+        }
+
+        function carregarMusica(id, vemDaSetlist) {
+            musicaAtualId = id;
+            const info = bancoMusicas[id];
+            document.getElementById("musica-titulo").innerText = info.titulo;
+            document.getElementById("controlos-transpose").style.display = "flex";
+            document.getElementById("btn-remover-setlist").style.display = vemDaSetlist ? "inline-block" : "none";
+
+            let deslocamento = 0;
+            if (vemDaSetlist) {
+                const item = setlists[setlistAtiva].find(s => s.id === id);
+                if (item) deslocamento = item.tomDeslocamento;
+            }
+
+            atualizarCifraDisplay(info.corpo, info.tomOriginal, deslocamento);
+        }
+
+        function obterNomeTom(tomOriginal, deslocamento) {
+            let idx = notas.indexOf(tomOriginal);
+            if (idx === -1) return tomOriginal;
+            let novoIdx = (idx + deslocamento) % 12;
+            if (novoIdx < 0) novoIdx += 12;
+            return notas[novoIdx];
+        }
+
+        function atualizarCifraDisplay(corpoOriginal, tomOriginal, deslocamento) {
+            document.getElementById("tom-atual").innerText = obterNomeTom(tomOriginal, deslocamento);
+            const cifraTransposta = corpoOriginal.replace(/\[(.*?)\]/g, function(match, acorde) {
+                let novoAcorde = acorde.replace(/([A-G]#?)/g, function(nota) {
+                    let idx = notas.indexOf(nota);
+                    if (idx === -1) return nota;
+                    let nIdx = (idx + deslocamento) % 12;
+                    if (nIdx < 0) nIdx += 12;
+                    return notas[nIdx];
+                });
+                return `<span class="chord">${novoAcorde}</span>`;
+            });
+            document.getElementById("cifra-corpo").innerHTML = cifraTransposta;
+        }
+
+        function mudarTom(direcao) {
+            if (!musicaAtualId) return;
+            const item = setlists[setlistAtiva].find(s => s.id === musicaAtualId);
+            if (item) {
+                item.tomDeslocamento += direcao;
+                renderizarSetlist();
+                carregarMusica(musicaAtualId, true);
+            } else {
+                alert("Adiciona primeiro a música à Setlist para alterares e gravares o tom!");
+            }
+        }
+
+        function adicionarÀSetlist(id, selectElement) {
+            const targetList = parseInt(selectElement.value);
+            if (!targetList) return;
+
+            if (!setlists[targetList].some(s => s.id === id)) {
+                setlists[targetList].push({ id: id, tomDeslocamento: 0 });
+                if(targetList === setlistAtiva) renderizarSetlist();
+                alert(`Música adicionada à Lista ${targetList}!`);
+            } else {
+                alert("Esta música já está nessa lista.");
+            }
+            selectElement.value = ""; // Reset do dropdown
+        }
+
+        function removerDaSetlist() {
+            setlists[setlistAtiva] = setlists[setlistAtiva].filter(s => s.id !== musicaAtualId);
+            renderizarSetlist();
+            document.getElementById("musica-titulo").innerText = "Seleciona uma música";
+            document.getElementById("cifra-corpo").innerText = "Escolhe uma música na barra lateral.";
+            document.getElementById("controlos-transpose").style.display = "none";
+        }
+
+        function gerarLinkPartilha() {
+            const lista = setlists[setlistAtiva];
+            if (lista.length === 0) {
+                alert("Esta setlist está vazia!");
+                return;
+            }
+            const dadosMapeados = lista.map(s => `${s.id}:${s.tomDeslocamento}`).join(',');
+            // Link final com o número da lista ativa e os tons gravados
+            const linkFinal = `${window.location.origin}${window.location.pathname}?l=${setlistAtiva}&d=${dadosMapeados}`;
+            
+            navigator.clipboard.writeText(linkFinal);
+            alert(`Link da Lista ${setlistAtiva} copiado com os tons salvos! Envia para a banda.`);
+        }
+    </script>
+</body>
+</html>
