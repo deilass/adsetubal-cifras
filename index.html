@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cifras & 3 Setlists da Banda</title>
+    <style>
+        :root { 
+            --bg: #121212; 
+            --card: #1e1e1e; 
+            --text: #e0e0e0; 
+            --accent: #00adb5; 
+            --chord: #ffde7d; 
+            --indicacao: #00adb5; /* Cor para Verso, Coro, Ponte, etc. (podes mudar a cor aqui) */
+            --font-size-base: 16px; 
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; gap: 20px; }
+        h1, h2, h3 { color: #fff; margin-top: 0; }
+        
+        .sidebar { width: 320px; background: var(--card); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; }
+        .main-content { flex: 1; background: var(--card); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
+        .search-input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #2d2d2d; color: white; box-sizing: border-box; margin-bottom: 10px; }
+        
+        .song-item { padding: 10px; background: #2d2d2d; margin-bottom: 8px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .song-item:hover { background: #3d3d3d; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 10px; background: #2a2a2a; padding: 5px; border-radius: 4px; }
+        .tab-btn { flex: 1; background: transparent; color: #aaa; border: none; padding: 6px; cursor: pointer; font-size: 12px; }
+        .tab-btn.active { background: var(--accent); color: white; border-radius: 4px; font-weight: bold; }
+        
+        button { background: var(--accent); border: none; color: white; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { opacity: 0.9; }
+        .select-setlist-add { background: #333; color: white; border: 1px solid #555; padding: 4px; border-radius: 4px; font-size: 12px; }
+        .btn-danger { background: #ff414d; }
+        .btn-nav-song { background: #3282b8; } 
+        .btn-share { background: #28a745; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; }
+        
+        .cifra-box { background: #1a1a1a; padding: 20px; border-radius: 6px; border: 1px solid #333; margin-top: 15px; }
+        .cifra-box.duas-colunas { column-count: 2; column-gap: 40px; column-rule: 1px solid #333; }
+        .cifra-linha { display: flex; flex-wrap: wrap; align-items: flex-end; min-height: 2.8em; break-inside: avoid; }
+        .cifra-linha-vazia { height: 1em; break-inside: avoid; }
+        
+        /* Estilo especial para as linhas de indicação */
+        .cifra-linha-indicacao { 
+            color: var(--indicacao); 
+            font-weight: bold; 
+            font-size: calc(var(--font-size-base) + 1px); 
+            margin-top: 12px; 
+            margin-bottom: 4px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            break-inside: avoid;
+        }
+        
+        .cifra-bloco { display: inline-flex; flex-direction: column; align-items: flex-start; }
+        .cifra-bloco .acorde { color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 2px); line-height: 1.4; white-space: pre; }
+        .cifra-bloco .silaba { font-family: monospace; font-size: var(--font-size-base); line-height: 1.6; white-space: pre; }
+        
+        .controls { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .list-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+
+        .main-content.mobile-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 99999 !important;
+            background: #121212 !important;
+            box-sizing: border-box !important;
+            overflow-y: auto !important;
+            border-radius: 0 !important;
+            padding: 30px 20px !important;
+        }
+
+        #btn-sair-fullscreen { display: none; }
+        .mobile-fullscreen #btn-sair-fullscreen { display: inline-block; background: #ff414d; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="barra-lateral">
+        <div>
+            <h2>1. Repositório</h2>
+            <input type="text" id="search-bar" class="search-input" placeholder="Digita para pesquisar música..." oninput="filtrarMusicas()">
+            <div id="lista-disponiveis" class="list-container">Digita algo para pesquisar...</div>
+        </div>
+
+        <div style="border-top: 1px solid #444; padding-top: 15px;">
+            <h2>2. Setlists</h2>
+            <div class="tabs">
+                <button class="tab-btn active" id="tab-1" onclick="mudarTabSetlist(1)">Lista 1</button>
+                <button class="tab-btn" id="tab-2" onclick="mudarTabSetlist(2)">Lista 2</button>
+                <button class="tab-btn" id="tab-3" onclick="mudarTabSetlist(3)">Lista 3</button>
+            </div>
+            <div id="lista-setlist" class="list-container"></div>
+            <button class="btn-share" onclick="generarLinkPartilha()">🔗 Partilhar esta Setlist</button>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-area">
+        <h1 id="musica-titulo">Seleciona uma música</h1>
+        
+        <div class="controls" id="controlos-transpose" style="display:none;">
+            <button class="btn-nav-song" onclick="navegarMusica(-1)">❮ Anterior</button>
+            <button class="btn-nav-song" onclick="navegarMusica(1)">Próxima ❯</button>
+
+            <span>Tom: <strong id="tom-atual" style="color:var(--chord);">Original</strong></span>
+            <button onclick="mudarTom(-1)">Semitom -</button>
+            <button onclick="mudarTom(1)">Semitom +</button>
+            
+            <button onclick="mudarTamanhoLetra(1)" style="background: #4e89ae;">A+</button>
+            <button onclick="mudarTamanhoLetra(-1)" style="background: #4e89ae;">A-</button>
+
+            <button onclick="toggleColunas()" id="btn-colunas">Colunas: 1</button>
+            <button onclick="toggleFullscreen()" style="background:#f0a500;" id="btn-fs-toggle">📺 Fullscreen</button>
+            <button onclick="toggleFullscreen()" id="btn-sair-fullscreen">Sair</button>
+            <button class="btn-danger" onclick="removerDaSetlist()" id="btn-remover-setlist">Remover da Setlist</button>
+        </div>
+        
+        <div class="cifra-box" id="cifra-corpo">Escolhe uma música na barra lateral ou na tua Setlist.</div>
+    </div>
+
+    <script>
+        let bancoMusicas = {};
+        const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        
+        let setlists = { 1: [], 2: [], 3: [] }; 
+        let setlistAtiva = 1;
+        let musicaAtualId = null;
+        let modoDuasColunas = false;
+        let tamanhoLetraAtual = 16;
+
+        window.onload = function() {
+            fetch('musicas.json')
+                .then(r => r.json())
+                .then(data => {
+                    bancoMusicas = data;
+                    carregarSetlistsDoLocalStorage();
+                    renderizarDisponiveis();
+                    lerParametrosURL();
+                })
+                .catch(() => {
+                    document.getElementById("lista-disponiveis").innerText = "Erro ao carregar o ficheiro musicas.json";
+                });
+        };
+
+        function guardarSetlistsNoLocalStorage() {
+            localStorage.setItem('setlists_banda', JSON.stringify(setlists));
+        }
+
+        function carregarSetlistsDoLocalStorage() {
+            const salvas = localStorage.getItem('setlists_banda');
+            if (salvas) setlists = JSON.parse(salvas);
+        }
+
+        function lerParametrosURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const listaParam = urlParams.get('l');
+            const dadosParam = urlParams.get('d');
+
+            if (listaParam && dadosParam) {
+                setlistAtiva = parseInt(listaParam);
+                setlists[setlistAtiva] = dadosParam.split(',').map(item => {
+                    const [id, deslocamento] = item.split(':');
+                    return { id, tomDeslocamento: parseInt(deslocamento) };
+                });
+                guardarSetlistsNoLocalStorage();
+            }
+            atualizarVisualTabs();
+            renderizarSetlist();
+            
+            if (listaParam && dadosParam && setlists[setlistAtiva].length > 0) {
+                carregarMusica(setlists[setlistAtiva][0].id, true);
+            }
+        }
+
+        function filtrarMusicas() {
+            renderizarDisponiveis();
+        }
+
+        function renderizarDisponiveis() {
+            const div = document.getElementById("lista-disponiveis");
+            const pesquisa = document.getElementById("search-bar").value.toLowerCase().trim();
+            div.innerHTML = "";
+            
+            if (pesquisa === "") {
+                div.innerHTML = "<p style='color:#666; font-size:13px; margin:5px 0;'>Digita algo para pesquisar...</p>";
+                return;
+            }
+
+            let encontradas = 0;
+            Object.keys(bancoMusicas).forEach(id => {
+                const titulo = bancoMusicas[id].titulo;
+                if (titulo.toLowerCase().includes(pesquisa)) {
+                    encontradas++;
+                    div.innerHTML += `
+                        <div class="song-item" onclick="carregarMusica('${id}', false)">
+                            <span>${titulo}</span>
+                            <select class="select-setlist-add" onclick="event.stopPropagation()" onchange="adicionarÀSetlist('${id}', this)">
+                                <option value="">+ Add...</option>
+                                <option value="1">Lista 1</option>
+                                <option value="2">Lista 2</option>
+                                <option value="3">Lista 3</option>
+                            </select>
+                        </div>`;
+                }
+            });
+
+            if (encontradas === 0) {
+                div.innerHTML = "<p style='color:#ff414d; font-size:13px; margin:5px 0;'>Nenhuma música encontrada.</p>";
+            }
+        }
+
+        function renderizarSetlist() {
+            const div = document.getElementById("lista-setlist");
+            div.innerHTML = "";
+            const lista = setlists[setlistAtiva];
+            
+            if(lista.length === 0) {
+                div.innerHTML = "<p style='color:#666; font-size:12px;'>Esta lista está vazia.</p>";
+                return;
+            }
+
+            lista.forEach((item, index) => {
+                const info = bancoMusicas[item.id];
+                if (!info) return;
+                const tomCalculado = obterNomeTom(info.tomOriginal, item.tomDeslocamento);
+                const activeClass = item.id === musicaAtualId ? 'style="border-left: 3px solid var(--accent); font-weight:bold;"' : '';
+                div.innerHTML += `
+                    <div class="song-item" ${activeClass} onclick="carregarMusica('${item.id}', true)">
+                        <span>${index + 1}. ${info.titulo} (<strong>${tomCalculado}</strong>)</span>
+                    </div>`;
+            });
+        }
+
+        function atualizarVisualTabs() {
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx + 1 === setlistAtiva);
+            });
+        }
+
+        function mudarTabSetlist(num) {
+            setlistAtiva = num;
+            atualizarVisualTabs();
+            renderizarSetlist();
+        }
+
+        function carregarMusica(id, vemDaSetlist) {
+            musicaAtualId = id;
+            const info = bancoMusicas[id];
+            if (!info) return;
+
+            document.getElementById("musica-titulo").innerText = info.titulo;
+            document.getElementById("controlos-transpose").style.display = "flex";
+            document.getElementById("btn-remover-setlist").style.display = vemDaSetlist ? "inline-block" : "none";
+
+            let deslocamento = 0;
+            if (vemDaSetlist) {
+                const item = setlists[setlistAtiva].find(s => s.id === id);
+                if (item) deslocamento = item.tomDeslocamento;
+            } else {
+                const itemNaSetlist = setlists[setlistAtiva].find(s => s.id === id);
+                if (itemNaSetlist) {
+                    deslocamento = itemNaSetlist.tomDeslocamento;
+                    document.getElementById("btn-remover-setlist").style.display = "inline-block";
+                }
+            }
+
+            atualizarCifraDisplay(info.corpo, info.tomOriginal, deslocamento);
+            renderizarSetlist();
+        }
+
+        function obterNomeTom(tomOriginal, deslocamento) {
+            let idx = notas.indexOf(tomOriginal);
+            if (idx === -1) return tomOriginal;
+            let novoIdx = (idx + deslocamento) % 12;
+            if (novoIdx < 0) novoIdx += 12;
+            return notas[novoIdx];
+        }
+
+        function transporAcorde(acorde, deslocamento) {
+            return acorde.replace(/([A-G]#?)/g, function(nota) {
+                let idx = notas.indexOf(nota);
+                if (idx === -1) return nota;
+                let nIdx = (idx + deslocamento) % 12;
+                if (nIdx < 0) nIdx += 12;
+                return notas[nIdx];
+            });
+        }
+
+        // FUNÇÃO ATUALIZADA: Deteta a marcação especial "*" para indicações da música
+        function renderizarLinha(linha, deslocamento) {
+            let linhaLimpa = linha.trim();
+            
+            // Se a linha começar com '*', trata-a como uma linha de indicação de estrutura/dinâmica
+            if (linhaLimpa.startsWith('*')) {
+                const textoIndicacao = linhaLimpa.substring(1).trim(); // Remove a estrela e espaços extras
+                return `<div class="cifra-linha-indicacao">${textoIndicacao}</div>`;
+            }
+
+            if (!linha.includes('[')) {
+                if (linha.trim() === '') return `<div class="cifra-linha-vazia"></div>`;
+                return `<div class="cifra-linha"><div class="cifra-bloco"><span class="acorde"> </span><span class="silaba">${linha}</span></div></div>`;
+            }
+
+            const blocos = [];
+            const regex = /\[([^\]]+)\]([^\[]*)/g;
+            let match;
+
+            const primeiroAcorde = linha.indexOf('[');
+            if (primeiroAcorde > 0) {
+                blocos.push({ acorde: '', silaba: linha.substring(0, primeiroAcorde) });
+            }
+
+            while ((match = regex.exec(linha)) !== null) {
+                const acorde = transporAcorde(match[1], deslocamento);
+                const silaba = match[2];
+                const largura = Math.max(acorde.length + 1, silaba.length);
+                blocos.push({ acorde, silaba, largura });
+            }
+
+            const html = blocos.map(b => {
+                if (!b.acorde) {
+                    return `<div class="cifra-bloco"><span class="acorde"> </span><span class="silaba">${b.silaba}</span></div>`;
+                }
+                const pad = ' '.repeat(Math.max(0, b.largura - b.silaba.length));
+                const acordePad = ' '.repeat(Math.max(0, b.largura - b.acorde.length));
+                return `<div class="cifra-bloco"><span class="acorde">${b.acorde}${acordePad}</span><span class="silaba">${b.silaba}${pad}</span></div>`;
+            }).join('');
+
+            return `<div class="cifra-linha">${html}</div>`;
+        }
+
+        function atualizarCifraDisplay(corpoOriginal, tomOriginal, deslocamento) {
+            document.getElementById("tom-atual").innerText = obterNomeTom(tomOriginal, deslocamento);
+            const lines = corpoOriginal.split('\n');
+            const html = lines.map(l => renderizarLinha(l, deslocamento)).join('');
+            document.getElementById("cifra-corpo").innerHTML = html;
+        }
+
+        function mudarTom(direcao) {
+            if (!musicaAtualId) return;
+            const item = setlists[setlistAtiva].find(s => s.id === musicaAtualId);
+            if (item) {
+                item.tomDeslocamento += direcao;
+                guardarSetlistsNoLocalStorage();
+                renderizarSetlist();
+                carregarMusica(musicaAtualId, true);
+            } else {
+                alert("Adiciona primeiro a música à Setlist para alterares e gravares o tom!");
+            }
+        }
+
+        function mudarTamanhoLetra(direcao) {
+            tamanhoLetraAtual += direcao * 2; 
+            if (tamanhoLetraAtual < 10) tamanhoLetraAtual = 10;
+            if (tamanhoLetraAtual > 32) tamanhoLetraAtual = 32;
+            document.documentElement.style.setProperty('--font-size-base', tamanhoLetraAtual + 'px');
+        }
+
+        function adicionarÀSetlist(id, selectElement) {
+            const targetList = parseInt(selectElement.value);
+            if (!targetList) return;
+
+            if (!setlists[targetList].some(s => s.id === id)) {
+                setlists[targetList].push({ id: id, tomDeslocamento: 0 });
+                guardarSetlistsNoLocalStorage();
+                if(targetList === setlistAtiva) renderizarSetlist();
+                alert(`Música adicionada à Lista ${targetList}!`);
+            } else {
+                alert("Esta música já está nessa lista.");
+            }
+            selectElement.value = "";
+        }
+
+        function removerDaSetlist() {
+            setlists[setlistAtiva] = setlists[setlistAtiva].filter(s => s.id !== musicaAtualId);
+            guardarSetlistsNoLocalStorage();
+            renderizarSetlist();
+            document.getElementById("musica-titulo").innerText = "Seleciona uma música";
+            document.getElementById("cifra-corpo").innerText = "Escolhe uma música na barra lateral.";
+            document.getElementById("controlos-transpose").style.display = "none";
+        }
+
+        function generarLinkPartilha() {
+            const lista = setlists[setlistAtiva];
+            if (lista.length === 0) {
+                alert("Esta setlist está vazia!");
+                return;
+            }
+            const dadosMapeados = lista.map(s => `${s.id}:${s.tomDeslocamento}`).join(',');
+            const linkFinal = `${window.location.origin}${window.location.pathname}?l=${setlistAtiva}&d=${dadosMapeados}`;
+            navigator.clipboard.writeText(linkFinal);
+            alert(`Link da Lista ${setlistAtiva} copiado!`);
+        }
+
+        function toggleColunas() {
+            modoDuasColunas = !modoDuasColunas;
+            const cifraBox = document.getElementById("cifra-corpo");
+            if (modoDuasColunas) {
+                cifraBox.classList.add("duas-colunas");
+                document.getElementById("btn-colunas").innerText = "Colunas: 2";
+            } else {
+                cifraBox.classList.remove("duas-colunas");
+                document.getElementById("btn-colunas").innerText = "Colunas: 1";
+            }
+        }
+
+        function toggleFullscreen() {
+            const elemento = document.getElementById("main-area");
+            const estaEmFullscreen = elemento.classList.contains("mobile-fullscreen");
+            
+            if (!estaEmFullscreen) {
+                elemento.classList.add("mobile-fullscreen");
+                document.getElementById("btn-fs-toggle").style.display = "none";
+                if (elemento.requestFullscreen) elemento.requestFullscreen().catch(() => {});
+            } else {
+                elemento.classList.remove("mobile-fullscreen");
+                document.getElementById("btn-fs-toggle").style.display = "inline-block";
+                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                document.getElementById("main-area").classList.remove("mobile-fullscreen");
+                document.getElementById("btn-fs-toggle").style.display = "inline-block";
+            }
+        });
+
+        function navegarMusica(direcao) {
+            const lista = setlists[setlistAtiva];
+            if (lista.length === 0 || !musicaAtualId) return;
+
+            const indexAtual = lista.findIndex(s => s.id === musicaAtualId);
+            if (indexAtual === -1) return;
+
+            let novoIndex = indexAtual + direcao;
+            if (novoIndex >= 0 && novoIndex < lista.length) {
+                carregarMusica(lista[novoIndex].id, true);
+                document.getElementById("main-area").scrollTop = 0;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById("main-area").classList.contains("mobile-fullscreen")) {
+                if (e.key === 'ArrowRight') navegarMusica(1);
+                if (e.key === 'ArrowLeft') navegarMusica(-1);
+            }
+        });
+
+        let touchstartX = 0;
+        let touchendX = 0;
+        const mainArea = document.getElementById("main-area");
+        
+        mainArea.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        }, false);
+
+        mainArea.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            lidarComSwipe();
+        }, false);
+
+        function lidarComSwipe() {
+            if (!document.getElementById("main-area").classList.contains("mobile-fullscreen")) return;
+            const limite = 60;
+            if (touchendX < touchstartX - limite) navegarMusica(1);
+            if (touchendX > touchstartX + limite) navegarMusica(-1);
+        }
+    </script>
+</body>
+</html>
