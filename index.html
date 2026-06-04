@@ -87,9 +87,9 @@
         <div style="border-top: 1px solid #444; padding-top: 15px;">
             <h2>2. Setlists</h2>
             <div class="tabs">
-                <button class="tab-btn active" id="tab-1" onclick="mudarTabSetlist(1)">Lista 1</button>
-                <button class="tab-btn" id="tab-2" onclick="mudarTabSetlist(2)">Lista 2</button>
-                <button class="tab-btn" id="tab-3" onclick="mudarTabSetlist(3)">Lista 3</button>
+                <button class="tab-btn active" id="tab-1" onclick="mudarTabSetlist(1)">Sexta</button>
+                <button class="tab-btn" id="tab-2" onclick="mudarTabSetlist(2)">Domingo</button>
+                <button class="tab-btn" id="tab-3" onclick="mudarTabSetlist(3)">Eventos</button>
             </div>
             <div id="lista-setlist" class="list-container"></div>
             <button class="btn-share" onclick="generarLinkPartilha()">🔗 Partilhar esta Setlist</button>
@@ -197,9 +197,9 @@
                             <span>${titulo}</span>
                             <select class="select-setlist-add" onclick="event.stopPropagation()" onchange="adicionarÀSetlist('${id}', this)">
                                 <option value="">+ Add...</option>
-                                <option value="1">Lista 1</option>
-                                <option value="2">Lista 2</option>
-                                <option value="3">Lista 3</option>
+                                <option value="1">Sexta</option>
+                                <option value="2">Domingo</option>
+                                <option value="3">Eventos</option>
                             </select>
                         </div>`;
                 }
