@@ -11,12 +11,17 @@
             --text: #e0e0e0; 
             --accent: #00adb5; 
             --chord: #ffde7d; 
-            --indicacao: #00adb5; /* Cor para Verso, Coro, Ponte, etc. (podes mudar a cor aqui) */
+            --indicacao: #00adb5; 
             --font-size-base: 16px; 
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; gap: 20px; }
         h1, h2, h3 { color: #fff; margin-top: 0; }
         
+        /* Alinhamento do título com o novo botão de configurações */
+        .titulo-container { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
+        .titulo-container h1 { margin: 0; }
+        .btn-toggle-configs { background: #555; padding: 5px 10px; font-size: 13px; }
+
         .sidebar { width: 320px; background: var(--card); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; }
         .main-content { flex: 1; background: var(--card); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; }
         .search-input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #2d2d2d; color: white; box-sizing: border-box; margin-bottom: 10px; }
@@ -34,25 +39,28 @@
         .btn-nav-song { background: #3282b8; } 
         .btn-share { background: #28a745; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; }
         
-        .cifra-box { background: #1a1a1a; padding: 20px; border-radius: 6px; border: 1px solid #333; margin-top: 15px; }
-        .cifra-box.duas-colunas { column-count: 2; column-gap: 40px; column-rule: 1px solid #333; }
-        .cifra-linha { display: flex; flex-wrap: wrap; align-items: flex-end; min-height: 2.8em; break-inside: avoid; }
-        .cifra-linha-vazia { height: 1em; break-inside: avoid; }
+        /* Reduzido o espaço da Cifra Box */
+        .cifra-box { background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #333; margin-top: 10px; }
+        .cifra-box.duas-colunas { column-count: 2; column-gap: 30px; column-rule: 1px solid #333; }
         
-        /* Estilo especial para as linhas de indicação */
+        /* REDUZIDO: Min-height e line-height mais baixos para compactar os parágrafos */
+        .cifra-linha { display: flex; flex-wrap: wrap; align-items: flex-end; min-height: 2.3em; break-inside: avoid; margin-bottom: 1px; }
+        .cifra-linha-vazia { height: 0.6em; break-inside: avoid; }
+        
+        /* REDUZIDO: Margens da indicação ligeiramente reduzidas */
         .cifra-linha-indicacao { 
             color: var(--indicacao); 
             font-weight: bold; 
             font-size: calc(var(--font-size-base) + 1px); 
-            margin-top: 12px; 
-            margin-bottom: 4px;
+            margin-top: 8px; 
+            margin-bottom: 2px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             break-inside: avoid;
         }
         
         .cifra-bloco { display: inline-flex; flex-direction: column; align-items: flex-start; }
-        .cifra-bloco .acorde { color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 2px); line-height: 1.4; white-space: pre; }
-        .cifra-bloco .silaba { font-family: monospace; font-size: var(--font-size-base); line-height: 1.6; white-space: pre; }
+        .cifra-bloco .acorde { color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 2px); line-height: 1.2; white-space: pre; }
+        .cifra-bloco .silaba { font-family: monospace; font-size: var(--font-size-base); line-height: 1.4; white-space: pre; }
         
         .controls { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .list-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
@@ -68,7 +76,7 @@
             box-sizing: border-box !important;
             overflow-y: auto !important;
             border-radius: 0 !important;
-            padding: 30px 20px !important;
+            padding: 20px 20px !important;
         }
 
         #btn-sair-fullscreen { display: none; }
@@ -77,6 +85,7 @@
 </head>
 <body>
 
+    <!-- BARRA LATERAL GESTÃO -->
     <div class="sidebar" id="barra-lateral">
         <div>
             <h2>1. Repositório</h2>
@@ -87,17 +96,22 @@
         <div style="border-top: 1px solid #444; padding-top: 15px;">
             <h2>2. Setlists</h2>
             <div class="tabs">
-                <button class="tab-btn active" id="tab-1" onclick="mudarTabSetlist(1)">Sexta</button>
-                <button class="tab-btn" id="tab-2" onclick="mudarTabSetlist(2)">Domingo</button>
-                <button class="tab-btn" id="tab-3" onclick="mudarTabSetlist(3)">Eventos</button>
+                <button class="tab-btn active" id="tab-1" onclick="mudarTabSetlist(1)">Lista 1</button>
+                <button class="tab-btn" id="tab-2" onclick="mudarTabSetlist(2)">Lista 2</button>
+                <button class="tab-btn" id="tab-3" onclick="mudarTabSetlist(3)">Lista 3</button>
             </div>
             <div id="lista-setlist" class="list-container"></div>
             <button class="btn-share" onclick="generarLinkPartilha()">🔗 Partilhar esta Setlist</button>
         </div>
     </div>
 
+    <!-- ÁREA DA CIFRA -->
     <div class="main-content" id="main-area">
-        <h1 id="musica-titulo">Seleciona uma música</h1>
+        <!-- Estrutura de Título modificada com o novo botão ao lado -->
+        <div class="titulo-container">
+            <h1 id="musica-titulo">Seleciona uma música</h1>
+            <button id="btn-toggle-config" class="btn-toggle-configs" onclick="toggleConfiguracoes()" style="display: none;">⚙️ Configs</button>
+        </div>
         
         <div class="controls" id="controlos-transpose" style="display:none;">
             <button class="btn-nav-song" onclick="navegarMusica(-1)">❮ Anterior</button>
@@ -128,6 +142,7 @@
         let musicaAtualId = null;
         let modoDuasColunas = false;
         let tamanhoLetraAtual = 16;
+        let configsVisiveis = true; // Controla se o painel está aberto ou fechado
 
         window.onload = function() {
             fetch('musicas.json')
@@ -197,9 +212,9 @@
                             <span>${titulo}</span>
                             <select class="select-setlist-add" onclick="event.stopPropagation()" onchange="adicionarÀSetlist('${id}', this)">
                                 <option value="">+ Add...</option>
-                                <option value="1">Sexta</option>
-                                <option value="2">Domingo</option>
-                                <option value="3">Eventos</option>
+                                <option value="1">Lista 1</option>
+                                <option value="2">Lista 2</option>
+                                <option value="3">Lista 3</option>
                             </select>
                         </div>`;
                 }
@@ -250,7 +265,12 @@
             if (!info) return;
 
             document.getElementById("musica-titulo").innerText = info.titulo;
-            document.getElementById("controlos-transpose").style.display = "flex";
+            document.getElementById("btn-toggle-config").style.display = "inline-block"; // Mostra o botão de configs
+            
+            // Restaura o estado visual correto da barra de configurações
+            const controlos = document.getElementById("controlos-transpose");
+            controlos.style.display = configsVisiveis ? "flex" : "none";
+            
             document.getElementById("btn-remover-setlist").style.display = vemDaSetlist ? "inline-block" : "none";
 
             let deslocamento = 0;
@@ -267,6 +287,23 @@
 
             atualizarCifraDisplay(info.corpo, info.tomOriginal, deslocamento);
             renderizarSetlist();
+        }
+
+        // NOVA FUNÇÃO: Esconde/mostra a barra de configurações e atualiza o texto do botão
+        function toggleConfiguracoes() {
+            configsVisiveis = !configsVisiveis;
+            const controlos = document.getElementById("controlos-transpose");
+            const btn = document.getElementById("btn-toggle-config");
+            
+            if (configsVisiveis) {
+                controlos.style.display = "flex";
+                btn.innerText = "⚙️ Ocultar Configs";
+                btn.style.background = "#555";
+            } else {
+                controlos.style.display = "none";
+                btn.innerText = "⚙️ Mostrar Configs";
+                btn.style.background = "var(--accent)";
+            }
         }
 
         function obterNomeTom(tomOriginal, deslocamento) {
@@ -287,13 +324,12 @@
             });
         }
 
-        // FUNÇÃO ATUALIZADA: Deteta a marcação especial "*" para indicações da música
         function renderizarLinha(linha, deslocamento) {
-            let linhaLimpa = linha.trim();
+            let linhaLimpa = Math.max ? linha.trim() : linha;
+            linhaLimpa = typeof linhaLimpa === 'string' ? linhaLimpa.trim() : '';
             
-            // Se a linha começar com '*', trata-a como uma linha de indicação de estrutura/dinâmica
             if (linhaLimpa.startsWith('*')) {
-                const textoIndicacao = linhaLimpa.substring(1).trim(); // Remove a estrela e espaços extras
+                const textoIndicacao = linhaLimpa.substring(1).trim();
                 return `<div class="cifra-linha-indicacao">${textoIndicacao}</div>`;
             }
 
@@ -379,6 +415,7 @@
             document.getElementById("musica-titulo").innerText = "Seleciona uma música";
             document.getElementById("cifra-corpo").innerText = "Escolhe uma música na barra lateral.";
             document.getElementById("controlos-transpose").style.display = "none";
+            document.getElementById("btn-toggle-config").style.display = "none";
         }
 
         function generarLinkPartilha() {
