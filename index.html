@@ -44,7 +44,14 @@
         .cifra-box.duas-colunas { column-count: 2; column-gap: 30px; column-rule: 1px solid #333; }
         
         /* REDUZIDO: Min-height e line-height mais baixos para compactar os parágrafos */
-        .cifra-linha { display: flex; flex-wrap: wrap; align-items: flex-end; min-height: 1.2em; break-inside: avoid; margin-bottom: -2px; }
+        .cifra-linha { 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: flex-end; 
+            min-height: 1.2em; /* Reduzido para aproximar as linhas de acordes */
+            break-inside: avoid; 
+            margin-bottom: 0px; 
+        }
         .cifra-linha-vazia { height: 0.4em; break-inside: avoid; }
         
         /* REDUZIDO: Margens da indicação ligeiramente reduzidas */
@@ -52,15 +59,23 @@
             color: var(--indicacao); 
             font-weight: bold; 
             font-size: calc(var(--font-size-base) + 1px); 
-            margin-top: 8px; 
-            margin-bottom: 2px;
+            margin-top: 2px;     /* Reduzido de 8px para 2px */
+            margin-bottom: 1px;  /* Reduzido de 2px para 1px */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             break-inside: avoid;
         }
         
         .cifra-bloco { display: inline-flex; flex-direction: column; align-items: flex-start; }
-        .cifra-bloco .acorde { color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 2px); line-height: 1.2; white-space: pre; }
-        .cifra-bloco .silaba { font-family: monospace; font-size: var(--font-size-base); line-height: 1.4; white-space: pre; }
+        .cifra-bloco .acorde { color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 2px); line-height: 1.0; white-space: pre; }
+        
+        /* SOLUÇÃO DO ESPAÇO FANTASMA: Se a sílaba estiver vazia ou apenas com espaços na intro, ela não ocupa altura */
+        .cifra-bloco .silaba { 
+            font-family: monospace; 
+            font-size: var(--font-size-base); 
+            line-height: 1.2; 
+            white-space: pre; 
+        }
+        .cifra-bloco .silaba:empty { display: none; }
         
         .controls { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .list-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
@@ -355,12 +370,17 @@
             }
 
             const html = blocos.map(b => {
+                // Se não houver acorde, renderiza apenas a sílaba
                 if (!b.acorde) {
-                    return `<div class="cifra-bloco"><span class="acorde"> </span><span class="silaba">${b.silaba}</span></div>`;
+                    return `<div class="cifra-bloco"><span class="acorde"></span><span class="silaba">${b.silaba}</span></div>`;
                 }
                 const pad = ' '.repeat(Math.max(0, b.largura - b.silaba.length));
                 const acordePad = ' '.repeat(Math.max(0, b.largura - b.acorde.length));
-                return `<div class="cifra-bloco"><span class="acorde">${b.acorde}${acordePad}</span><span class="silaba">${b.silaba}${pad}</span></div>`;
+                
+                // Se a sílaba for puramente espaços ou vazia (caso das intros/tags dentro de retos), limpamos para o CSS atuar
+                const silabaConteudo = b.silaba.trim() === '' ? '' : `${b.silaba}${pad}`;
+                
+                return `<div class="cifra-bloco"><span class="acorde">${b.acorde}${acordePad}</span><span class="silaba">${silabaConteudo}</span></div>`;
             }).join('');
 
             return `<div class="cifra-linha">${html}</div>`;
