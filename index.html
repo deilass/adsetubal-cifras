@@ -40,8 +40,33 @@
         .btn-share { background: #28a745; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; }
         
         /* Reduzido o espaço da Cifra Box */
-        .cifra-box { background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #333; margin-top: 10px; }
-        .cifra-box.duas-colunas { column-count: 2; column-gap: 30px; column-rule: 1px solid #333; }
+        .cifra-box { 
+            background: #1a1a1a; 
+            padding: 15px; 
+            border-radius: 6px; 
+            border: 1px solid #333; 
+            margin-top: 10px; 
+            box-sizing: border-box;
+        }
+        
+        /* NOVA LÓGICA DE COLUNAS FLUIDAS: O conteúdo flui na vertical e só abre nova coluna se faltar espaço */
+        .cifra-box.duas-colunas { 
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap; /* Permite transbordar para o lado (gerar colunas) */
+            align-content: flex-start;
+            column-gap: 40px;
+            
+            /* Define a altura máxima baseada na altura da janela do navegador, descontando o topo e controlos */
+            max-height: calc(100vh - 180px); 
+            overflow-x: auto; /* Se a música for gigante e gerar uma 3ª coluna, cria scroll horizontal em vez de vertical */
+            overflow-y: hidden; /* Desativa o scroll vertical nesta caixa */
+        }
+
+        /* Garante que em modo fullscreen o cálculo da altura máxima se adapta ao ecrã total */
+        .mobile-fullscreen .cifra-box.duas-colunas {
+            max-height: calc(100vh - 120px);
+        }
         
         /* REDUZIDO: Min-height e line-height mais baixos para compactar os parágrafos */
         .cifra-linha { 
@@ -455,7 +480,7 @@
             const cifraBox = document.getElementById("cifra-corpo");
             if (modoDuasColunas) {
                 cifraBox.classList.add("duas-colunas");
-                document.getElementById("btn-colunas").innerText = "Colunas: 2";
+                document.getElementById("btn-colunas").innerText = "Colunas: Auto";
             } else {
                 cifraBox.classList.remove("duas-colunas");
                 document.getElementById("btn-colunas").innerText = "Colunas: 1";
