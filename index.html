@@ -62,16 +62,56 @@
             max-height: calc(100vh - 120px);
         }
         
-        .cifra-linha-vazia { height: 0.6em; break-inside: avoid; }
+        /* LINHA DA CIFRA: Contentor flexível para manter as sílabas alinhadas na horizontal */
+        .cifra-linha { 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: flex-end; 
+            min-height: 2.4em;
+            break-inside: avoid; 
+            margin-bottom: 6px;
+        }
+        .cifra-linha-vazia { height: 0.8em; break-inside: avoid; }
         
         .cifra-linha-indicacao { 
             color: var(--indicacao); 
             font-weight: bold; 
             font-size: calc(var(--font-size-base) + 1px); 
-            margin-top: 6px;     
-            margin-bottom: 2px;  
+            margin-top: 10px;     
+            margin-bottom: 4px;  
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             break-inside: avoid;
+        }
+
+        /* BLOCO DE SÍLABA: Centraliza o acorde cirurgicamente em cima da sílaba/caractere correspondente */
+        .cifra-silaba-bloco {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center; /* Centralização horizontal exata em cima do fragmento */
+            position: relative;
+            vertical-align: bottom;
+        }
+
+        .cifra-silaba-bloco .acorde {
+            color: var(--chord);
+            font-weight: bold;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: calc(var(--font-size-base) - 1px);
+            line-height: 1.1;
+            margin-bottom: 2px;
+            text-align: center;
+            min-height: 1.1em;
+            white-space: nowrap;
+            padding: 0 2px; /* Margem de segurança para evitar que acordes longos se esbarrem */
+        }
+        
+        .cifra-silaba-bloco .texto-silaba { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-size: var(--font-size-base); 
+            line-height: 1.2; 
+            color: var(--text);
+            white-space: pre; /* Mantém espaços normais e hífens intactos */
+            text-align: center;
         }
         
         .controls { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -122,7 +162,7 @@
             <button id="btn-toggle-config" class="btn-toggle-configs" onclick="toggleConfiguracoes()" style="display: none;">⚙️ Configs</button>
         </div>
         
-        <div class="controls" id="controlos-transpose" style="display:none;">
+        <div class="controls" id="controlos-transpose" style="none;">
             <button class="btn-nav-song" onclick="navegarMusica(-1)">❮ Anterior</button>
             <button class="btn-nav-song" onclick="navegarMusica(1)">Próxima ❯</button>
 
@@ -331,7 +371,7 @@
             });
         }
 
-        // NOVO MOTOR DE RENDERIZAÇÃO: Mantém o texto limpo e calcula as coordenadas espaciais dos acordes
+        // MOTOR DE ALINHAMENTO DINÂMICO POR SÍLABA E ACORDES ISOLADOS
         function renderizarLinha(linha, deslocamento) {
             let linhaLimpa = typeof linha === 'string' ? linha.trim() : '';
             
@@ -344,50 +384,71 @@
                 return `<div class="cifra-linha-vazia"></div>`;
             }
 
-            // Se a linha não tiver acordes de todo, cospe apenas o texto nativo sem mexer nas propriedades
-            if (!linha.includes('[')) {
-                return `
-                    <div class="cifra-par-linhas" style="display: flex; flex-direction: column; break-inside: avoid; margin-bottom: 2px;">
-                        <div class="linha-de-texto" style="color: var(--text); font-family: monospace; font-size: var(--font-size-base); white-space: pre; line-height: 1.2;">${linha}</div>
-                    </div>
-                `;
-            }
-
-            let linhaAcordes = "";
-            let linhaTexto = "";
+            let tokens = [];
             let i = 0;
+            let acordePendente = null;
 
             while (i < linha.length) {
                 if (linha[i] === '[') {
-                    let fimAcorde = linha.indexOf(']', i);
-                    if (fimAcorde === -1) break;
-                    
-                    let acordeOriginal = linha.substring(i + 1, fimAcorde);
-                    let acordeTransposto = transporAcorde(acordeOriginal, deslocamento);
-                    
-                    // Coloca o acorde exatamente na posição correta da linha superior virtual
-                    if (linhaAcordes.length < linhaTexto.length) {
-                        linhaAcordes += " ".repeat(linhaTexto.length - linhaAcordes.length);
-                    }
-                    linhaAcordes += acordeTransposto;
-                    i = fimAcorde + 1;
+                    let fim = linha.indexOf(']', i);
+                    if (fim === -1) break;
+                    let ac = linha.substring(i + 1, fim);
+                    acordePendente = transporAcorde(ac, deslocamento);
+                    i = fim + 1;
                 } else {
-                    linhaTexto += linha[i];
-                    i++;
+                    // Isola os caracteres até encontrar o próximo acorde ou um espaço.
+                    // Se houver um acorde pendente, capturamos apenas os caracteres imediatos que formam a sílaba/sufixo correspondente.
+                    let textoFragmento = "";
+                    
+                    if (acordePendente !== null) {
+                        // Captura apenas até à próxima quebra natural de estrutura (espaço, hífen ou novo acorde)
+                        while (i < linha.length && linha[i] !== '[' && linha[i] !== ' ' && linha[i] !== '-') {
+                            textoFragmento += linha[i];
+                            i++;
+                        }
+                        // Inclui o hífen se foi ele que interrompeu a sílaba
+                        if (i < linha.length && linha[i] === '-') {
+                            textoFragmento += '-';
+                            i++;
+                        }
+                    } else {
+                        // Se não há acorde, consome texto corrido ou espaços normalmente
+                        while (i < linha.length && linha[i] !== '[') {
+                            textoFragmento += linha[i];
+                            i++;
+                        }
+                    }
+
+                    if (textoFragmento !== "" || acordePendente !== null) {
+                        tokens.push({
+                            acorde: acordePendente,
+                            texto: textoFragmento
+                        });
+                        acordePendente = null; 
+                    }
                 }
             }
 
-            // Garante o preenchimento caso a linha de acordes termine mais curta que a de texto
-            if (linhaAcordes.length < linhaTexto.length) {
-                linhaAcordes += " ".repeat(linhaTexto.length - linhaAcordes.length);
+            if (acordePendente !== null) {
+                tokens.push({
+                    acorde: acordePendente,
+                    texto: "&nbsp;"
+                });
             }
 
-            return `
-                <div class="cifra-par-linhas" style="display: flex; flex-direction: column; break-inside: avoid; margin-bottom: 2px;">
-                    <div class="linha-de-acordes" style="color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 1px); white-space: pre; line-height: 1.0;">${linhaAcordes}</div>
-                    <div class="linha-de-texto" style="color: var(--text); font-family: monospace; font-size: var(--font-size-base); white-space: pre; line-height: 1.2;">${linhaTexto}</div>
-                </div>
-            `;
+            // Converte os blocos mantendo a centralização estrita sobre a sílaba
+            let htmlResult = tokens.map(t => {
+                let txtDisplay = t.texto;
+                if (txtDisplay === "") txtDisplay = "&nbsp;";
+                
+                return `
+                    <div class="cifra-silaba-bloco">
+                        <span class="acorde">${t.acorde || ''}</span>
+                        <span class="texto-silaba">${txtDisplay}</span>
+                    </div>`;
+            }).join('');
+
+            return `<div class="cifra-linha">${htmlResult}</div>`;
         }
 
         function atualizarCifraDisplay(corpoOriginal, tomOriginal, deslocamento) {
@@ -466,7 +527,6 @@
             }
         }
 
-        // Melhorado para lidar com o Fullscreen nativo em navegadores modernos
         function toggleFullscreen() {
             const elemento = document.getElementById("main-area");
             const estaEmFullscreen = elemento.classList.contains("mobile-fullscreen");
