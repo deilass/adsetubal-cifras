@@ -17,7 +17,6 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; gap: 20px; }
         h1, h2, h3 { color: #fff; margin-top: 0; }
         
-        /* Alinhamento do título com o novo botão de configurações */
         .titulo-container { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
         .titulo-container h1 { margin: 0; }
         .btn-toggle-configs { background: #555; padding: 5px 10px; font-size: 13px; }
@@ -48,7 +47,6 @@
             box-sizing: border-box;
         }
         
-        /* COLUNAS FLUIDAS */
         .cifra-box.duas-colunas { 
             display: flex;
             flex-direction: column;
@@ -66,7 +64,6 @@
         
         .cifra-linha-vazia { height: 0.6em; break-inside: avoid; }
         
-        /* Secções com '*' */
         .cifra-linha-indicacao { 
             color: var(--indicacao); 
             font-weight: bold; 
@@ -77,7 +74,6 @@
             break-inside: avoid;
         }
 
-        /* Comentários/Dinâmicas com '#' */
         .cifra-linha-comentario { 
             color: #ff9f43; 
             font-style: italic; 
@@ -327,7 +323,7 @@
             }
         }
 
-        function obtenerNomeTom(tomOriginal, deslocamento) {
+        function obterNomeTom(tomOriginal, deslocamento) {
             let idx = notas.indexOf(tomOriginal);
             if (idx === -1) return tomOriginal;
             let novoIdx = (idx + deslocamento) % 12;
@@ -345,38 +341,36 @@
             });
         }
 
-        // SOLUÇÃO DE FUNDO PROFISSIONAL: Alinhamento matemático baseado em strings paralelas
+        // FUNÇÃO TOTALMENTE CORRIGIDA E PREVENTIVA Contra LINHAS SEM ACORDES
         function renderizarLinha(linha, deslocamento) {
             let linhaLimpa = typeof linha === 'string' ? linha.trim() : '';
             
-            // 1. Identifica indicação (* Coro)
             if (linhaLimpa.startsWith('*')) {
                 const textoIndicacao = linhaLimpa.substring(1).trim();
                 return `<div class="cifra-linha-indicacao">${textoIndicacao}</div>`;
             }
 
-            // 2. Identifica comentário/dinâmica (# Intro suave)
             if (linhaLimpa.startsWith('#')) {
                 const textoComentario = linhaLimpa.substring(1).trim();
                 return `<div class="cifra-linha-comentario">💡 ${textoComentario}</div>`;
             }
 
-            // Linha vazia
             if (linha.trim() === '') {
                 return `<div class="cifra-linha-vazia"></div>`;
             }
 
-            // 3. Sem acordes, renderiza texto simples monoespaçado
+            // Se a linha NÃO contiver acordes, renderiza o texto original diretamente!
             if (!linha.includes('[')) {
-                return `<div style="font-family: monospace; font-size: var(--font-size-base); white-space: pre; min-height: 1.2em; color: var(--text);">${linha}</div>`;
+                return `<div class="cifra-par-linhas" style="display: flex; flex-direction: column; break-inside: avoid; margin-bottom: 2px;">
+                    <div class="linha-de-texto" style="color: var(--text); font-family: monospace; font-size: var(--font-size-base); white-space: pre; line-height: 1.2;">${linha}</div>
+                </div>`;
             }
 
-            // 4. Criação das duas linhas paralelas (Acordes no topo, Texto em baixo)
             let linhaAcordes = "";
             let linhaTexto = "";
             let i = 0;
 
-            while (i < linha.length) {
+            while (i < blueprint = linha.length) {
                 if (linha[i] === '[') {
                     let fimAcorde = linha.indexOf(']', i);
                     if (fimAcorde === -1) break;
@@ -389,7 +383,6 @@
                 } else {
                     linhaTexto += linha[i];
                     
-                    // Alinha o comprimento das strings adicionando espaços à que ficou para trás
                     if (linhaAcordes.length < linhaTexto.length) {
                         linhaAcordes += " ";
                     } else if (linhaAcordes.length > linhaTexto.length) {
