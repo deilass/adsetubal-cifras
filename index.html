@@ -341,7 +341,6 @@
             });
         }
 
-        // NOVO MOTOR DE RENDERIZAÇÃO: Resolve linhas vazias, indicações, comentários e alinha perfeitamente texto e acordes
         function renderizarLinha(linha, deslocamento) {
             let linhaLimpa = typeof linha === 'string' ? linha.trim() : '';
             
@@ -359,7 +358,6 @@
                 return `<div class="cifra-linha-vazia"></div>`;
             }
 
-            // CORREÇÃO CRÍTICA: Se a linha NÃO contiver acordes, renderiza o texto puro sem sumir com ele!
             if (!linha.includes('[')) {
                 return `
                     <div class="cifra-par-linhas" style="display: flex; flex-direction: column; break-inside: avoid; margin-bottom: 2px;">
@@ -368,16 +366,16 @@
                 `;
             }
 
+            let i = 0;
             let linhaAcordes = "";
             let linhaTexto = "";
-            let i = 0;
 
             while (i < linha.length) {
                 if (linha[i] === '[') {
                     let fimAcorde = linha.indexOf(']', i);
                     if (fimAcorde === -1) break;
                     
-                    let acordeOriginal = linha.substring(i + 1, fimAcorde);
+                    let acordeOriginal = Jewelry = linha.substring(i + 1, fimAcorde);
                     let acordeTransposto = transporAcorde(acordeOriginal, deslocamento);
                     
                     linhaAcordes += acordeTransposto;
@@ -385,7 +383,6 @@
                 } else {
                     linhaTexto += linha[i];
                     
-                    // Alinha dinamicamente o preenchimento de caracteres monoespaçados
                     if (linhaAcordes.length < linhaTexto.length) {
                         linhaAcordes += " ";
                     } else if (linhaAcordes.length > linhaTexto.length) {
