@@ -17,7 +17,6 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; gap: 20px; }
         h1, h2, h3 { color: #fff; margin-top: 0; }
         
-        /* Alinhamento do título com o novo botão de configurações */
         .titulo-container { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
         .titulo-container h1 { margin: 0; }
         .btn-toggle-configs { background: #555; padding: 5px 10px; font-size: 13px; }
@@ -353,13 +352,13 @@
         function renderizarLinha(linha, deslocamento) {
             let linhaLimpa = typeof linha === 'string' ? linha.trim() : '';
             
-            // Tratamento das linhas com asterisco (*) -> Estrutura (Azul)
+            // Suporte para partes da música com asterisco (*) -> Azul
             if (linhaLimpa.startsWith('*')) {
                 const textoIndicacao = linhaLimpa.substring(1).trim();
                 return `<div class="cifra-linha-indicacao">${textoIndicacao}</div>`;
             }
             
-            // Tratamento das linhas com cardinal (#) -> Dinâmica (Laranja / Itálico)
+            // Suporte para comentários de dinâmica com cardinal (#) -> Laranja / Itálico
             if (linhaLimpa.startsWith('#')) {
                 const textoDinamica = linhaLimpa.substring(1).trim();
                 return `<div class="cifra-linha-dinamica">${textoDinamica}</div>`;
@@ -392,19 +391,11 @@
                     i = fim + 1;
                 } else {
                     let char = linha[i];
-                    let charHTML = char;
-                    if (char === ' ') charHTML = " ";
-                    linhaTexto += charHTML;
+                    linhaTexto += char;
                     
-                    let visualLen = 1;
                     let plainAcordes = linhaAcordes.replace(/<[^>]*>/g, "");
-                    while (plainAcordes.length < plainAcordes.length + visualLen) {
-                        if (linhaAcordes.length < plainAcordes.length + visualLen) {
-                            linhaAcordes += " ";
-                            plainAcordes += " ";
-                        } else {
-                            break;
-                        }
+                    if (plainAcordes.length < j + 1) {
+                        linhaAcordes += " ";
                     }
                     j++;
                     i++;
