@@ -39,7 +39,6 @@
         .btn-nav-song { background: #3282b8; } 
         .btn-share { background: #28a745; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; }
         
-        /* Reduzido o espaço da Cifra Box */
         .cifra-box { 
             background: #1a1a1a; 
             padding: 15px; 
@@ -49,69 +48,45 @@
             box-sizing: border-box;
         }
         
-        /* NOVA LÓGICA DE COLUNAS FLUIDAS: O conteúdo flui na vertical e só abre nova coluna se faltar espaço */
+        /* COLUNAS FLUIDAS */
         .cifra-box.duas-colunas { 
             display: flex;
             flex-direction: column;
-            flex-wrap: wrap; /* Permite transbordar para o lado (gerar colunas) */
+            flex-wrap: wrap; 
             align-content: flex-start;
             column-gap: 40px;
-            
-            /* Define a altura máxima baseada na altura da janela do navegador, descontando o topo e controlos */
             max-height: calc(100vh - 180px); 
-            overflow-x: auto; /* Se a música for gigante e gerar uma 3ª coluna, cria scroll horizontal em vez de vertical */
-            overflow-y: hidden; /* Desativa o scroll vertical nesta caixa */
+            overflow-x: auto; 
+            overflow-y: hidden; 
         }
 
-        /* Garante que em modo fullscreen o cálculo da altura máxima se adapta ao ecrã total */
         .mobile-fullscreen .cifra-box.duas-colunas {
             max-height: calc(100vh - 120px);
         }
         
-        /* REDUZIDO: Min-height e line-height mais baixos para compactar os parágrafos */
-        .cifra-linha { 
-            display: flex; 
-            flex-wrap: wrap; 
-            align-items: flex-end; 
-            min-height: 1.2em; /* Reduzido para aproximar as linhas de acordes */
-            break-inside: avoid; 
-            margin-bottom: 0px; 
-        }
-        .cifra-linha-vazia { height: 0.4em; break-inside: avoid; }
+        .cifra-linha-vazia { height: 0.6em; break-inside: avoid; }
         
-        /* REDUZIDO: Margens da indicação ligeiramente reduzidas */
+        /* Secções com '*' */
         .cifra-linha-indicacao { 
             color: var(--indicacao); 
             font-weight: bold; 
             font-size: calc(var(--font-size-base) + 1px); 
-            margin-top: 2px;     /* Reduzido de 8px para 2px */
-            margin-bottom: 1px;  /* Reduzido de 2px para 1px */
+            margin-top: 6px;     
+            margin-bottom: 2px;  
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             break-inside: avoid;
         }
 
-        /* NOVA CLASSE: Estilo para comentários e dinâmicas iniciadas com '#' */
+        /* Comentários/Dinâmicas com '#' */
         .cifra-linha-comentario { 
-            color: #ff9f43; /* Tom de coral/laranja para diferenciar das secções */
-            font-style: italic; /* Texto em itálico */
+            color: #ff9f43; 
+            font-style: italic; 
             font-size: calc(var(--font-size-base) - 1px); 
-            margin-top: 2px;
-            margin-bottom: 2px;
+            margin-top: 4px;
+            margin-bottom: 4px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             break-inside: avoid;
         }
-        
-        .cifra-bloco { display: inline-flex; flex-direction: column; align-items: flex-start; }
-        .cifra-bloco .acorde { color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 2px); line-height: 1.0; white-space: pre; }
-        
-        /* SOLUÇÃO DO ESPAÇO FANTASMA: Se a sílaba estiver vazia ou apenas com espaços na intro, ela não ocupa altura */
-        .cifra-bloco .silaba { 
-            font-family: monospace; 
-            font-size: var(--font-size-base); 
-            line-height: 1.2; 
-            white-space: pre; 
-        }
-        .cifra-bloco .silaba:empty { display: none; }
         
         .controls { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .list-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
@@ -190,7 +165,7 @@
         let musicaAtualId = null;
         let modoDuasColunas = false;
         let tamanhoLetraAtual = 16;
-        let configsVisiveis = true; // Controla se o painel está aberto ou fechado
+        let configsVisiveis = true;
 
         window.onload = function() {
             fetch('musicas.json')
@@ -313,9 +288,8 @@
             if (!info) return;
 
             document.getElementById("musica-titulo").innerText = info.titulo;
-            document.getElementById("btn-toggle-config").style.display = "inline-block"; // Mostra o botão de configs
+            document.getElementById("btn-toggle-config").style.display = "inline-block";
             
-            // Restaura o estado visual correto da barra de configurações
             const controlos = document.getElementById("controlos-transpose");
             controlos.style.display = configsVisiveis ? "flex" : "none";
             
@@ -337,7 +311,6 @@
             renderizarSetlist();
         }
 
-        // NOVA FUNÇÃO: Esconde/mostra a barra de configurações e atualiza o texto do botão
         function toggleConfiguracoes() {
             configsVisiveis = !configsVisiveis;
             const controlos = document.getElementById("controlos-transpose");
@@ -354,7 +327,7 @@
             }
         }
 
-        function obterNomeTom(tomOriginal, deslocamento) {
+        function obtenerNomeTom(tomOriginal, deslocamento) {
             let idx = notas.indexOf(tomOriginal);
             if (idx === -1) return tomOriginal;
             let novoIdx = (idx + deslocamento) % 12;
@@ -372,55 +345,66 @@
             });
         }
 
+        // SOLUÇÃO DE FUNDO PROFISSIONAL: Alinhamento matemático baseado em strings paralelas
         function renderizarLinha(linha, deslocamento) {
-            let linhaLimpa = Math.max ? linha.trim() : linha;
-            linhaLimpa = typeof linhaLimpa === 'string' ? linhaLimpa.trim() : '';
+            let linhaLimpa = typeof linha === 'string' ? linha.trim() : '';
             
+            // 1. Identifica indicação (* Coro)
             if (linhaLimpa.startsWith('*')) {
                 const textoIndicacao = linhaLimpa.substring(1).trim();
                 return `<div class="cifra-linha-indicacao">${textoIndicacao}</div>`;
             }
 
-            // NOVA LOGICA: Renderiza linhas de comentário começadas com '#'
+            // 2. Identifica comentário/dinâmica (# Intro suave)
             if (linhaLimpa.startsWith('#')) {
                 const textoComentario = linhaLimpa.substring(1).trim();
                 return `<div class="cifra-linha-comentario">💡 ${textoComentario}</div>`;
             }
 
+            // Linha vazia
+            if (linha.trim() === '') {
+                return `<div class="cifra-linha-vazia"></div>`;
+            }
+
+            // 3. Sem acordes, renderiza texto simples monoespaçado
             if (!linha.includes('[')) {
-                if (linha.trim() === '') return `<div class="cifra-linha-vazia"></div>`;
-                return `<div class="cifra-linha"><div class="cifra-bloco"><span class="acorde"> </span><span class="silaba">${linha}</span></div></div>`;
+                return `<div style="font-family: monospace; font-size: var(--font-size-base); white-space: pre; min-height: 1.2em; color: var(--text);">${linha}</div>`;
             }
 
-            const blocos = [];
-            const regex = /\[([^\]]+)\]([^\[]*)/g;
-            let match;
+            // 4. Criação das duas linhas paralelas (Acordes no topo, Texto em baixo)
+            let linhaAcordes = "";
+            let linhaTexto = "";
+            let i = 0;
 
-            const primeiroAcorde = presidential = linha.indexOf('[');
-            if (primeiroAcorde > 0) {
-                blocos.push({ acorde: '', silaba: linha.substring(0, primeiroAcorde) });
-            }
-
-            while ((match = regex.exec(linha)) !== null) {
-                const acorde = transporAcorde(match[1], deslocamento);
-                const silaba = match[2];
-                const largura = Math.max(acorde.length + 1, silaba.length);
-                blocos.push({ acorde, silaba, largura });
-            }
-
-            const html = blocos.map(b => {
-                if (!b.acorde) {
-                    return `<div class="cifra-bloco"><span class="acorde"></span><span class="silaba">${b.silaba}</span></div>`;
+            while (i < linha.length) {
+                if (linha[i] === '[') {
+                    let fimAcorde = linha.indexOf(']', i);
+                    if (fimAcorde === -1) break;
+                    
+                    let acordeOriginal = linha.substring(i + 1, fimAcorde);
+                    let acordeTransposto = transporAcorde(acordeOriginal, deslocamento);
+                    
+                    linhaAcordes += acordeTransposto;
+                    i = fimAcorde + 1;
+                } else {
+                    linhaTexto += linha[i];
+                    
+                    // Alinha o comprimento das strings adicionando espaços à que ficou para trás
+                    if (linhaAcordes.length < linhaTexto.length) {
+                        linhaAcordes += " ";
+                    } else if (linhaAcordes.length > linhaTexto.length) {
+                        linhaTexto += " ".repeat(linhaAcordes.length - linhaTexto.length);
+                    }
+                    i++;
                 }
-                const pad = ' '.repeat(Math.max(0, b.largura - b.silaba.length));
-                const acordePad = ' '.repeat(Math.max(0, b.largura - b.acorde.length));
-                
-                const silabaConteudo = b.silaba.trim() === '' ? '' : `${b.silaba}${pad}`;
-                
-                return `<div class="cifra-bloco"><span class="acorde">${b.acorde}${acordePad}</span><span class="silaba">${silabaConteudo}</span></div>`;
-            }).join('');
+            }
 
-            return `<div class="cifra-linha">${html}</div>`;
+            return `
+                <div class="cifra-par-linhas" style="display: flex; flex-direction: column; break-inside: avoid; margin-bottom: 2px;">
+                    <div class="linha-de-acordes" style="color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 1px); white-space: pre; line-height: 1.0;">${linhaAcordes}</div>
+                    <div class="linha-de-texto" style="color: var(--text); font-family: monospace; font-size: var(--font-size-base); white-space: pre; line-height: 1.2;">${linhaTexto}</div>
+                </div>
+            `;
         }
 
         function atualizarCifraDisplay(corpoOriginal, tomOriginal, deslocamento) {
