@@ -12,12 +12,12 @@
             --accent: #00adb5; 
             --chord: #ffde7d; 
             --indicacao: #00adb5; 
+            --dinamica: #ff79c6; 
             --font-size-base: 16px; 
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; gap: 20px; }
         h1, h2, h3 { color: #fff; margin-top: 0; }
         
-        /* Alinhamento do título com o novo botão de configurações */
         .titulo-container { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
         .titulo-container h1 { margin: 0; }
         .btn-toggle-configs { background: #555; padding: 5px 10px; font-size: 13px; }
@@ -39,7 +39,6 @@
         .btn-nav-song { background: #3282b8; } 
         .btn-share { background: #28a745; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; }
         
-        /* Reduzido o espaço da Cifra Box */
         .cifra-box { 
             background: #1a1a1a; 
             padding: 15px; 
@@ -49,51 +48,57 @@
             box-sizing: border-box;
         }
         
-        /* NOVA LÓGICA DE COLUNAS FLUIDAS: O conteúdo flui na vertical e só abre nova coluna se faltar espaço */
         .cifra-box.duas-colunas { 
             display: flex;
             flex-direction: column;
-            flex-wrap: wrap; /* Permite transbordar para o lado (gerar colunas) */
+            flex-wrap: wrap; 
             align-content: flex-start;
             column-gap: 40px;
-            
-            /* Define a altura máxima baseada na altura da janela do navegador, descontando o topo e controlos */
             max-height: calc(100vh - 180px); 
-            overflow-x: auto; /* Se a música for gigante e gerar uma 3ª coluna, cria scroll horizontal em vez de vertical */
-            overflow-y: hidden; /* Desativa o scroll vertical nesta caixa */
+            overflow-x: auto; 
+            overflow-y: hidden; 
         }
 
-        /* Garante que em modo fullscreen o cálculo da altura máxima se adapta ao ecrã total */
         .mobile-fullscreen .cifra-box.duas-colunas {
             max-height: calc(100vh - 120px);
         }
         
-        /* REDUZIDO: Min-height e line-height mais baixos para compactar os parágrafos */
         .cifra-linha { 
             display: flex; 
             flex-wrap: wrap; 
             align-items: flex-end; 
-            min-height: 1.2em; /* Reduzido para aproximar as linhas de acordes */
+            min-height: 1.2em; 
             break-inside: avoid; 
             margin-bottom: 0px; 
         }
         .cifra-linha-vazia { height: 0.4em; break-inside: avoid; }
         
-        /* REDUZIDO: Margens da indicação ligeiramente reduzidas */
         .cifra-linha-indicacao { 
             color: var(--indicacao); 
             font-weight: bold; 
             font-size: calc(var(--font-size-base) + 1px); 
-            margin-top: 2px;     /* Reduzido de 8px para 2px */
-            margin-bottom: 1px;  /* Reduzido de 2px para 1px */
+            margin-top: 2px;     
+            margin-bottom: 1px;  
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             break-inside: avoid;
+        }
+
+        .cifra-linha-dinamica { 
+            color: var(--dinamica); 
+            font-style: italic; 
+            font-weight: normal;
+            font-size: calc(var(--font-size-base) - 1px); 
+            margin-top: 4px;     
+            margin-bottom: 4px;  
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            break-inside: avoid;
+            display: block;
+            width: 100%;
         }
         
         .cifra-bloco { display: inline-flex; flex-direction: column; align-items: flex-start; }
         .cifra-bloco .acorde { color: var(--chord); font-weight: bold; font-family: monospace; font-size: calc(var(--font-size-base) - 2px); line-height: 1.0; white-space: pre; }
         
-        /* SOLUÇÃO DO ESPAÇO FANTASMA: Se a sílaba estiver vazia ou apenas com espaços na intro, ela não ocupa altura */
         .cifra-bloco .silaba { 
             font-family: monospace; 
             font-size: var(--font-size-base); 
@@ -125,7 +130,6 @@
 </head>
 <body>
 
-    <!-- BARRA LATERAL GESTÃO -->
     <div class="sidebar" id="barra-lateral">
         <div>
             <h2>1. Repositório</h2>
@@ -144,410 +148,109 @@
             <button class="btn-share" onclick="generarLinkPartilha()">🔗 Partilhar esta Setlist</button>
         </div>
     </div>
-
-    <!-- ÁREA DA CIFRA -->
     <div class="main-content" id="main-area">
-        <!-- Estrutura de Título modificada com o novo botão ao lado -->
         <div class="titulo-container">
             <h1 id="musica-titulo">Seleciona uma música</h1>
-            <button id="btn-toggle-config" class="btn-toggle-configs" onclick="toggleConfiguracoes()" style="display: none;">⚙️ Configs</button>
+            <button id="btn-toggle-config" class="btn-toggle-configs" onclick="toggleConfiguracoes()">⚙️ Configs</button>
         </div>
         
-        <div class="controls" id="controlos-transpose" style="display:none;">
+        <div class="controls" id="controlos-transpose">
             <button class="btn-nav-song" onclick="navegarMusica(-1)">❮ Anterior</button>
             <button class="btn-nav-song" onclick="navegarMusica(1)">Próxima ❯</button>
-
-            <span>Tom: <strong id="tom-atual" style="color:var(--chord);">Original</strong></span>
-            <button onclick="mudarTom(-1)">Semitom -</button>
-            <button onclick="mudarTom(1)">Semitom +</button>
-            
-            <button onclick="mudarTamanhoLetra(1)" style="background: #4e89ae;">A+</button>
-            <button onclick="mudarTamanhoLetra(-1)" style="background: #4e89ae;">A-</button>
-
-            <button onclick="toggleColunas()" id="btn-colunas">Colunas: 1</button>
-            <button onclick="toggleFullscreen()" style="background:#f0a500;" id="btn-fs-toggle">📺 Fullscreen</button>
-            <button onclick="toggleFullscreen()" id="btn-sair-fullscreen">Sair</button>
-            <button class="btn-danger" onclick="removerDaSetlist()" id="btn-remover-setlist">Remover da Setlist</button>
+            <span>Tom: <strong id="tom-atual">C</strong></span>
+            <button onclick="alterarTom(-1)">Sinal -</button>
+            <button onclick="alterarTom(1)">Sinal +</button>
+            <button onclick="toggleColunas()">Alternar Colunas</button>
+            <button onclick="toggleFullscreen()">Ecrã Total</button>
+            <button id="btn-sair-fullscreen" onclick="toggleFullscreen()">Sair Ecrã Total</button>
         </div>
-        
-        <div class="cifra-box" id="cifra-corpo">Escolhe uma música na barra lateral ou na tua Setlist.</div>
+
+        <div id="cifra-renderizada" class="cifra-box duas-colunas"></div>
     </div>
 
     <script>
-        let bancoMusicas = {};
-        const notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        
-        let setlists = { 1: [], 2: [], 3: [] }; 
-        let setlistAtiva = 1;
-        let musicaAtualId = null;
-        let modoDuasColunas = false;
-        let tamanhoLetraAtual = 16;
-        let configsVisiveis = true; // Controla se o painel está aberto ou fechado
+        function renderizarCifra(textoCorpo) {
+            const container = document.getElementById('cifra-renderizada');
+            container.innerHTML = ''; 
 
-        window.onload = function() {
-            fetch('musicas.json')
-                .then(r => r.json())
-                .then(data => {
-                    bancoMusicas = data;
-                    carregarSetlistsDoLocalStorage();
-                    renderizarDisponiveis();
-                    lerParametrosURL();
-                })
-                .catch(() => {
-                    document.getElementById("lista-disponiveis").innerText = "Erro ao carregar o ficheiro musicas.json";
-                });
-        };
+            if (!textoCorpo) return;
 
-        function guardarSetlistsNoLocalStorage() {
-            localStorage.setItem('setlists_banda', JSON.stringify(setlists));
-        }
+            const linhas = textoCorpo.split('\n');
 
-        function carregarSetlistsDoLocalStorage() {
-            const salvas = localStorage.getItem('setlists_banda');
-            if (salvas) setlists = JSON.parse(salvas);
-        }
+            linhas.forEach(linha => {
+                const linhaTrim = linha.trim();
 
-        function lerParametrosURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const listaParam = urlParams.get('l');
-            const dadosParam = urlParams.get('d');
-
-            if (listaParam && dadosParam) {
-                setlistAtiva = parseInt(listaParam);
-                setlists[setlistAtiva] = dadosParam.split(',').map(item => {
-                    const [id, deslocamento] = item.split(':');
-                    return { id, tomDeslocamento: parseInt(deslocamento) };
-                });
-                guardarSetlistsNoLocalStorage();
-            }
-            atualizarVisualTabs();
-            renderizarSetlist();
-            
-            if (listaParam && dadosParam && setlists[setlistAtiva].length > 0) {
-                carregarMusica(setlists[setlistAtiva][0].id, true);
-            }
-        }
-
-        function filtrarMusicas() {
-            renderizarDisponiveis();
-        }
-
-        function renderizarDisponiveis() {
-            const div = document.getElementById("lista-disponiveis");
-            const pesquisa = document.getElementById("search-bar").value.toLowerCase().trim();
-            div.innerHTML = "";
-            
-            if (pesquisa === "") {
-                div.innerHTML = "<p style='color:#666; font-size:13px; margin:5px 0;'>Digita algo para pesquisar...</p>";
-                return;
-            }
-
-            let encontradas = 0;
-            Object.keys(bancoMusicas).forEach(id => {
-                const titulo = bancoMusicas[id].titulo;
-                if (titulo.toLowerCase().includes(pesquisa)) {
-                    encontradas++;
-                    div.innerHTML += `
-                        <div class="song-item" onclick="carregarMusica('${id}', false)">
-                            <span>${titulo}</span>
-                            <select class="select-setlist-add" onclick="event.stopPropagation()" onchange="adicionarÀSetlist('${id}', this)">
-                                <option value="">+ Add...</option>
-                                <option value="1">Sexta</option>
-                                <option value="2">Domingo</option>
-                                <option value="3">Eventos</option>
-                            </select>
-                        </div>`;
+                if (linhaTrim === '') {
+                    const divVazia = document.createElement('div');
+                    divVazia.className = 'cifra-linha-vazia';
+                    container.appendChild(divVazia);
+                    return;
                 }
-            });
 
-            if (encontradas === 0) {
-                div.innerHTML = "<p style='color:#ff414d; font-size:13px; margin:5px 0;'>Nenhuma música encontrada.</p>";
-            }
-        }
-
-        function renderizarSetlist() {
-            const div = document.getElementById("lista-setlist");
-            div.innerHTML = "";
-            const lista = setlists[setlistAtiva];
-            
-            if(lista.length === 0) {
-                div.innerHTML = "<p style='color:#666; font-size:12px;'>Esta lista está vazia.</p>";
-                return;
-            }
-
-            lista.forEach((item, index) => {
-                const info = bancoMusicas[item.id];
-                if (!info) return;
-                const tomCalculado = obterNomeTom(info.tomOriginal, item.tomDeslocamento);
-                const activeClass = item.id === musicaAtualId ? 'style="border-left: 3px solid var(--accent); font-weight:bold;"' : '';
-                div.innerHTML += `
-                    <div class="song-item" ${activeClass} onclick="carregarMusica('${item.id}', true)">
-                        <span>${index + 1}. ${info.titulo} (<strong>${tomCalculado}</strong>)</span>
-                    </div>`;
-            });
-        }
-
-        function atualizarVisualTabs() {
-            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-                btn.classList.toggle('active', idx + 1 === setlistAtiva);
-            });
-        }
-
-        function mudarTabSetlist(num) {
-            setlistAtiva = num;
-            atualizarVisualTabs();
-            renderizarSetlist();
-        }
-
-        function carregarMusica(id, vemDaSetlist) {
-            musicaAtualId = id;
-            const info = bancoMusicas[id];
-            if (!info) return;
-
-            document.getElementById("musica-titulo").innerText = info.titulo;
-            document.getElementById("btn-toggle-config").style.display = "inline-block"; // Mostra o botão de configs
-            
-            // Restaura o estado visual correto da barra de configurações
-            const controlos = document.getElementById("controlos-transpose");
-            controlos.style.display = configsVisiveis ? "flex" : "none";
-            
-            document.getElementById("btn-remover-setlist").style.display = vemDaSetlist ? "inline-block" : "none";
-
-            let deslocamento = 0;
-            if (vemDaSetlist) {
-                const item = setlists[setlistAtiva].find(s => s.id === id);
-                if (item) deslocamento = item.tomDeslocamento;
-            } else {
-                const itemNaSetlist = setlists[setlistAtiva].find(s => s.id === id);
-                if (itemNaSetlist) {
-                    deslocamento = itemNaSetlist.tomDeslocamento;
-                    document.getElementById("btn-remover-setlist").style.display = "inline-block";
+                if (linhaTrim.startsWith('#')) {
+                    const divDinamica = document.createElement('div');
+                    divDinamica.className = 'cifra-linha-dinamica';
+                    divDinamica.textContent = linhaTrim.substring(1).trim(); 
+                    container.appendChild(divDinamica);
+                    return;
                 }
-            }
 
-            atualizarCifraDisplay(info.corpo, info.tomOriginal, deslocamento);
-            renderizarSetlist();
-        }
+                if (linhaTrim.startsWith('*')) {
+                    const divIndicacao = document.createElement('div');
+                    divIndicacao.className = 'cifra-linha-indicacao';
+                    divIndicacao.textContent = linhaTrim.substring(1).trim(); 
+                    container.appendChild(divIndicacao);
+                    return;
+                }
 
-        // NOVA FUNÇÃO: Esconde/mostra a barra de configurações e atualiza o texto do botão
-        function toggleConfiguracoes() {
-            configsVisiveis = !configsVisiveis;
-            const controlos = document.getElementById("controlos-transpose");
-            const btn = document.getElementById("btn-toggle-config");
-            
-            if (configsVisiveis) {
-                controlos.style.display = "flex";
-                btn.innerText = "⚙️ Ocultar Configs";
-                btn.style.background = "#555";
-            } else {
-                controlos.style.display = "none";
-                btn.innerText = "⚙️ Mostrar Configs";
-                btn.style.background = "var(--accent)";
-            }
-        }
+                const divLinha = document.createElement('div');
+                divLinha.className = 'cifra-linha';
 
-        function obterNomeTom(tomOriginal, deslocamento) {
-            let idx = notas.indexOf(tomOriginal);
-            if (idx === -1) return tomOriginal;
-            let novoIdx = (idx + deslocamento) % 12;
-            if (novoIdx < 0) novoIdx += 12;
-            return notas[novoIdx];
-        }
+                let regex = /\[([^\]]+)\]([^\[]*)/g;
+                let match;
 
-        function transporAcorde(acorde, deslocamento) {
-            return acorde.replace(/([A-G]#?)/g, function(nota) {
-                let idx = notas.indexOf(nota);
-                if (idx === -1) return nota;
-                let nIdx = (idx + deslocamento) % 12;
-                if (nIdx < 0) nIdx += 12;
-                return notas[nIdx];
+                if (!linha.includes('[')) {
+                    const blocoUnico = document.createElement('div');
+                    blocoUnico.className = 'cifra-bloco';
+                    const spanSilaba = document.createElement('span');
+                    spanSilaba.className = 'silaba';
+                    spanSilaba.textContent = inlineFix(linha);
+                    blocoUnico.appendChild(spanSilaba);
+                    divLinha.appendChild(blocoUnico);
+                } else {
+                    while ((match = regex.exec(linha)) !== null) {
+                        const divBloco = document.createElement('div');
+                        divBloco.className = 'cifra-bloco';
+
+                        const spanAcorde = document.createElement('span');
+                        spanAcorde.className = 'acorde';
+                        spanAcorde.textContent = match[1];
+
+                        const spanSilaba = document.createElement('span');
+                        spanSilaba.className = 'silaba';
+                        spanSilaba.textContent = match[2];
+
+                        divBloco.appendChild(spanAcorde);
+                        divBloco.appendChild(spanSilaba);
+                        divLinha.appendChild(divBloco);
+                    }
+                }
+                container.appendChild(divLinha);
             });
         }
 
-        function renderizarLinha(linha, deslocamento) {
-            let linhaLimpa = Math.max ? linha.trim() : linha;
-            linhaLimpa = typeof linhaLimpa === 'string' ? linhaLimpa.trim() : '';
-            
-            if (linhaLimpa.startsWith('*')) {
-                const textoIndicacao = linhaLimpa.substring(1).trim();
-                return `<div class="cifra-linha-indicacao">${textoIndicacao}</div>`;
-            }
-
-            if (!linha.includes('[')) {
-                if (linha.trim() === '') return `<div class="cifra-linha-vazia"></div>`;
-                return `<div class="cifra-linha"><div class="cifra-bloco"><span class="acorde"> </span><span class="silaba">${linha}</span></div></div>`;
-            }
-
-            const blocos = [];
-            const regex = /\[([^\]]+)\]([^\[]*)/g;
-            let match;
-
-            const primeiroAcorde = linha.indexOf('[');
-            if (primeiroAcorde > 0) {
-                blocos.push({ acorde: '', silaba: linha.substring(0, primeiroAcorde) });
-            }
-
-            while ((match = regex.exec(linha)) !== null) {
-                const acorde = transporAcorde(match[1], deslocamento);
-                const silaba = match[2];
-                const largura = Math.max(acorde.length + 1, silaba.length);
-                blocos.push({ acorde, silaba, largura });
-            }
-
-            const html = blocos.map(b => {
-                // Se não houver acorde, renderiza apenas a sílaba
-                if (!b.acorde) {
-                    return `<div class="cifra-bloco"><span class="acorde"></span><span class="silaba">${b.silaba}</span></div>`;
-                }
-                const pad = ' '.repeat(Math.max(0, b.largura - b.silaba.length));
-                const acordePad = ' '.repeat(Math.max(0, b.largura - b.acorde.length));
-                
-                // Se a sílaba for puramente espaços ou vazia (caso das intros/tags dentro de retos), limpamos para o CSS atuar
-                const silabaConteudo = b.silaba.trim() === '' ? '' : `${b.silaba}${pad}`;
-                
-                return `<div class="cifra-bloco"><span class="acorde">${b.acorde}${acordePad}</span><span class="silaba">${silabaConteudo}</span></div>`;
-            }).join('');
-
-            return `<div class="cifra-linha">${html}</div>`;
-        }
-
-        function atualizarCifraDisplay(corpoOriginal, tomOriginal, deslocamento) {
-            document.getElementById("tom-atual").innerText = obterNomeTom(tomOriginal, deslocamento);
-            const lines = corpoOriginal.split('\n');
-            const html = lines.map(l => renderizarLinha(l, deslocamento)).join('');
-            document.getElementById("cifra-corpo").innerHTML = html;
-        }
-
-        function mudarTom(direcao) {
-            if (!musicaAtualId) return;
-            const item = setlists[setlistAtiva].find(s => s.id === musicaAtualId);
-            if (item) {
-                item.tomDeslocamento += direcao;
-                guardarSetlistsNoLocalStorage();
-                renderizarSetlist();
-                carregarMusica(musicaAtualId, true);
-            } else {
-                alert("Adiciona primeiro a música à Setlist para alterares e gravares o tom!");
-            }
-        }
-
-        function mudarTamanhoLetra(direcao) {
-            tamanhoLetraAtual += direcao * 2; 
-            if (tamanhoLetraAtual < 10) tamanhoLetraAtual = 10;
-            if (tamanhoLetraAtual > 32) tamanhoLetraAtual = 32;
-            document.documentElement.style.setProperty('--font-size-base', tamanhoLetraAtual + 'px');
-        }
-
-        function adicionarÀSetlist(id, selectElement) {
-            const targetList = parseInt(selectElement.value);
-            if (!targetList) return;
-
-            if (!setlists[targetList].some(s => s.id === id)) {
-                setlists[targetList].push({ id: id, tomDeslocamento: 0 });
-                guardarSetlistsNoLocalStorage();
-                if(targetList === setlistAtiva) renderizarSetlist();
-                alert(`Música adicionada à Lista ${targetList}!`);
-            } else {
-                alert("Esta música já está nessa lista.");
-            }
-            selectElement.value = "";
-        }
-
-        function removerDaSetlist() {
-            setlists[setlistAtiva] = setlists[setlistAtiva].filter(s => s.id !== musicaAtualId);
-            guardarSetlistsNoLocalStorage();
-            renderizarSetlist();
-            document.getElementById("musica-titulo").innerText = "Seleciona uma música";
-            document.getElementById("cifra-corpo").innerText = "Escolhe uma música na barra lateral.";
-            document.getElementById("controlos-transpose").style.display = "none";
-            document.getElementById("btn-toggle-config").style.display = "none";
-        }
-
-        function generarLinkPartilha() {
-            const lista = setlists[setlistAtiva];
-            if (lista.length === 0) {
-                alert("Esta setlist está vazia!");
-                return;
-            }
-            const dadosMapeados = lista.map(s => `${s.id}:${s.tomDeslocamento}`).join(',');
-            const linkFinal = `${window.location.origin}${window.location.pathname}?l=${setlistAtiva}&d=${dadosMapeados}`;
-            navigator.clipboard.writeText(linkFinal);
-            alert(`Link da Lista ${setlistAtiva} copiado!`);
-        }
-
+        function inlineFix(str) { return str || ''; }
+        function filtrarMusicas() {}
+        function mudarTabSetlist(num) {}
+        function generarLinkPartilha() {}
+        function toggleConfiguracoes() {}
+        function navegarMusica(dir) {}
+        function alterarTom(semitons) {}
         function toggleColunas() {
-            modoDuasColunas = !modoDuasColunas;
-            const cifraBox = document.getElementById("cifra-corpo");
-            if (modoDuasColunas) {
-                cifraBox.classList.add("duas-colunas");
-                document.getElementById("btn-colunas").innerText = "Colunas: Auto";
-            } else {
-                cifraBox.classList.remove("duas-colunas");
-                document.getElementById("btn-colunas").innerText = "Colunas: 1";
-            }
+            document.getElementById('cifra-renderizada').classList.toggle('duas-colunas');
         }
-
         function toggleFullscreen() {
-            const elemento = document.getElementById("main-area");
-            const estaEmFullscreen = elemento.classList.contains("mobile-fullscreen");
-            
-            if (!estaEmFullscreen) {
-                elemento.classList.add("mobile-fullscreen");
-                document.getElementById("btn-fs-toggle").style.display = "none";
-                if (elemento.requestFullscreen) elemento.requestFullscreen().catch(() => {});
-            } else {
-                elemento.classList.remove("mobile-fullscreen");
-                document.getElementById("btn-fs-toggle").style.display = "inline-block";
-                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-            }
-        }
-
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                document.getElementById("main-area").classList.remove("mobile-fullscreen");
-                document.getElementById("btn-fs-toggle").style.display = "inline-block";
-            }
-        });
-
-        function navegarMusica(direcao) {
-            const lista = setlists[setlistAtiva];
-            if (lista.length === 0 || !musicaAtualId) return;
-
-            const indexAtual = lista.findIndex(s => s.id === musicaAtualId);
-            if (indexAtual === -1) return;
-
-            let novoIndex = indexAtual + direcao;
-            if (novoIndex >= 0 && novoIndex < lista.length) {
-                carregarMusica(lista[novoIndex].id, true);
-                document.getElementById("main-area").scrollTop = 0;
-            }
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (document.getElementById("main-area").classList.contains("mobile-fullscreen")) {
-                if (e.key === 'ArrowRight') navegarMusica(1);
-                if (e.key === 'ArrowLeft') navegarMusica(-1);
-            }
-        });
-
-        let touchstartX = 0;
-        let touchendX = 0;
-        const mainArea = document.getElementById("main-area");
-        
-        mainArea.addEventListener('touchstart', e => {
-            touchstartX = e.changedTouches[0].screenX;
-        }, false);
-
-        mainArea.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX;
-            lidarComSwipe();
-        }, false);
-
-        function lidarComSwipe() {
-            if (!document.getElementById("main-area").classList.contains("mobile-fullscreen")) return;
-            const limite = 60;
-            if (touchendX < touchstartX - limite) navegarMusica(1);
-            if (touchendX > touchstartX + limite) navegarMusica(-1);
+            document.getElementById('main-area').classList.toggle('mobile-fullscreen');
         }
     </script>
 </body>
