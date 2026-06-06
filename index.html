@@ -73,16 +73,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             break-inside: avoid;
         }
-
-        .cifra-linha-comentario { 
-            color: #ff9f43; 
-            font-style: italic; 
-            font-size: calc(var(--font-size-base) - 1px); 
-            margin-top: 4px;
-            margin-bottom: 4px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            break-inside: avoid;
-        }
         
         .controls { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .list-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
@@ -341,6 +331,7 @@
             });
         }
 
+        // NOVO MOTOR DE RENDERIZAÇÃO: Mantém o texto limpo e calcula as coordenadas espaciais dos acordes
         function renderizarLinha(linha, deslocamento) {
             let linhaLimpa = typeof linha === 'string' ? linha.trim() : '';
             
@@ -349,15 +340,11 @@
                 return `<div class="cifra-linha-indicacao">${textoIndicacao}</div>`;
             }
 
-            if (linhaLimpa.startsWith('#')) {
-                const textoComentario = linhaLimpa.substring(1).trim();
-                return `<div class="cifra-linha-comentario">💡 ${textoComentario}</div>`;
-            }
-
             if (linha.trim() === '') {
                 return `<div class="cifra-linha-vazia"></div>`;
             }
 
+            // Se a linha não tiver acordes de todo, cospe apenas o texto nativo sem mexer nas propriedades
             if (!linha.includes('[')) {
                 return `
                     <div class="cifra-par-linhas" style="display: flex; flex-direction: column; break-inside: avoid; margin-bottom: 2px;">
@@ -366,30 +353,33 @@
                 `;
             }
 
-            let i = 0;
             let linhaAcordes = "";
             let linhaTexto = "";
+            let i = 0;
 
             while (i < linha.length) {
                 if (linha[i] === '[') {
                     let fimAcorde = linha.indexOf(']', i);
                     if (fimAcorde === -1) break;
                     
-                    let acordeOriginal = Jewelry = linha.substring(i + 1, fimAcorde);
+                    let acordeOriginal = linha.substring(i + 1, fimAcorde);
                     let acordeTransposto = transporAcorde(acordeOriginal, deslocamento);
                     
+                    // Coloca o acorde exatamente na posição correta da linha superior virtual
+                    if (linhaAcordes.length < linhaTexto.length) {
+                        linhaAcordes += " ".repeat(linhaTexto.length - linhaAcordes.length);
+                    }
                     linhaAcordes += acordeTransposto;
                     i = fimAcorde + 1;
                 } else {
                     linhaTexto += linha[i];
-                    
-                    if (linhaAcordes.length < linhaTexto.length) {
-                        linhaAcordes += " ";
-                    } else if (linhaAcordes.length > linhaTexto.length) {
-                        linhaTexto += " ".repeat(linhaAcordes.length - linhaTexto.length);
-                    }
                     i++;
                 }
+            }
+
+            // Garante o preenchimento caso a linha de acordes termine mais curta que a de texto
+            if (linhaAcordes.length < linhaTexto.length) {
+                linhaAcordes += " ".repeat(linhaTexto.length - linhaAcordes.length);
             }
 
             return `
@@ -476,6 +466,7 @@
             }
         }
 
+        // Melhorado para lidar com o Fullscreen nativo em navegadores modernos
         function toggleFullscreen() {
             const elemento = document.getElementById("main-area");
             const estaEmFullscreen = elemento.classList.contains("mobile-fullscreen");
