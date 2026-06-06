@@ -1,37 +1,22 @@
 {
-  "musica1": {
-    "titulo": "Eis-me Aqui",
-    "tomOriginal": "C",
-    "corpo": "* Verso 1\n[C]Amanheceu, a [G]luz brilhou\n[Am]E o Teu amor me [F]alcançou\n\n*Coro\n[C]Em Tua presença [G]eu irei\n[Am]E o Teu nome [F]louvarei"
-  },
-  "hosana": {
-    "titulo": "Hosana",
-    "tomOriginal": "E",
-    "corpo": "* Verso 1\n[E]Vejo o Rei da [C#m]glória\nVindo [F#m]com o Seu po[B]der\nA terra vai tre[C#m]mer\n\n[E]Vejo a Sua [C#m]graça\nOs peca[F#m]dos perdo[B]ar\nA banda vai can[C#m]tar"
-  },
-  "grato-estou": {
-    "titulo": "Grato Estou",
-    "tomOriginal": "G",
-    "corpo": "* Verso 1\n[G]Te agradeço por [D]tudo o que fizeste\n[Em]Pelo amor que [C]Tu me deste"
-  },
   "grato-sou": {
     "titulo": "Grato Sou",
     "tomOriginal": "C",
     "corpo": "* Verso 1\nNo [C]Meio da escuridão\nEm [C]busca de proteção\nMeu cora[F]ção\nPerdido andou[C]\nEu [C]tentei por minhas mãos\n[C]Mas tudo foi em vão\nEstava à de[F]riva\nUm pecador[C]\n* Pre Coro 1\nPen[G]sava eu que [Am]era o fim\nMas [F]Cristo veio [C]até mim\nE [G]descobri que [Am]já não estava [F]só\n* Coro\nMe [C]levantou, [F]transformou\nSobre [Am]uma rocha [F]me firmou\nEu Te agra[Am]deço, meu Salva[F]dor\nMeu cora[C]ção curou\nMeu [F]nome mudou\nE [Am]pela graça [F]livre sou\nEu Te agra[Am]deço, meu Salva[F]dor\nGrato [C]sou [Csus] [C] [Csus] [C]\n* Verso 2\nNão [C]posso negar o que vi\nHo[C]je eu escolho crer em ti\nToda a incer[F]teza, se dissi[C]pou\nE os [C]fardos que carreguei\nA [C]Cristo eu entreguei\nSou nova criatura[F]\nUm filho [C]sou\n* Pre Coro 2\nE de [G]hoje até à e[Am]ternidade\nEu [F]cantarei da [C]Tua bondade\nDe um [G]pródigo\nQue a [Am]casa retor[F]nou\n* ---> Coro\n* Ponte 1\nDas [C]trevas me resgatou\n[C]Livre sou\nLivre sou\nLivre sou\n* Ponte 2\nDas [G]trevas me resgatou\n[C]Livre sou\nLivre sou\nLivre sou"
   },
-"ao-que-e-digno": {
+  "ao-que-e-digno": {
     "titulo": "Ao que é Digno",
     "tomOriginal": "C",
-    "corpo": "* Intro\n[| C9 - - - | - - - - | G - - - | - - - - |]\n[| C9 - - - | - - - - | G - - - | - - - - |]\n[| Bb6add9 - - - | Am7 - - - | Gm7 - - - | Am7 - - - | Bb6add9 - - - |]\n[| Am7 - - - | Bb/C - - - | C/Bb (Slap Baixo) |]\n[G/F] [F/Eb] [Eb/Bb] [Db/Ab] [| Gsus - - - | G - - - |]\nSegue Acordes do Coro\n\n* Estrofe\nAo [C]que é digno de receber a [Fmaj7]glória\nAo [Em7]que é digno de receber [Gsus]Louvor\n(Repete)\n\n[C/E]Levan[Fmaj7]temos nossas [G/F]mãos e a[Em7]dore[Am]mos\nA [Fmaj7]Jesus cor[G/F]deiro de gló[Em7] - ri[Gm7]a\n[F#7b5]E - xal - [Fmaj7]temos sua [G/F]incomparável [Em7]majes[A9]tade\nAo que vi[Dm7] - [Em7]ve p'ra [F]sempre\nAo [Dm7]grande [Em7]Eu SOU [F]a [Gsus]Je[C]sus\nR: [Gm7] [C7]\n\n* Tag\n[| Bb | F/A | C |]\nA Je - sus"
+    "corpo": "* Intro\n[| C9 - - - | - - - - | G - - - | - - - - |]\n[| C9 - - - | - - - - | G - - - | - - - - |]\n[| Bb6add9 - - - | Am7 - - - | Gm7 - - - | Am7 - - - | Bb6add9 - - - |]\n[| Am7 - - - | Bb/C - - - | C/Bb (Slap Baixo) |]\n[G/F] [F/Eb] [Eb/Bb] [Db/Ab] [| Gsus - - - | G - - - |]\n#Segue Acordes do Coro\n\n* Estrofe\nAo [C]que é digno de receber a [Fmaj7]glória\nAo [Em7]que é digno de receber [Gsus]Louvor\n(Repete)\n*Coro\n[C/E]Levan[Fmaj7]temos nossas [G/F]mãos e a[Em7]dore[Am]mos\nA [Fmaj7]Jesus cor[G/F]deiro de gló[Em7] - ri[Gm7]a\n[F#7b5]E - xal - [Fmaj7]temos sua [G/F]incomparável [Em7]majes[A9]tade\nAo que vi[Dm7] - [Em7]ve p'ra [F]sempre\nAo [Dm7]grande [Em7]Eu SOU [F]a [Gsus]Je[C]sus\nR: [Gm7] [C7]\n\n* Tag\n[| Bb | F/A | C |]\nA Je - sus"
   },
   "quero-conhecer-jesus": {
     "titulo": "Quero Conhecer Jesus",
     "tomOriginal": "C",
-    "corpo": "* Intro\n[| C2 - - - | Dsus4 - - - | Em7 - - - | D2 - - - |] 2x\n* Verso\nO meu [C]orgulho me tirou do [Dsus4]jardim\nSua [Em7]humildade colocou o jardim em [Bm7]mim\nE se eu [C]vender tudo o que tenho\nEm [Dsus4]troca do amor eu [Em7]falha[D]ria\nPois o [C]amor não se compra, nem [Dsus4]se merece\nO [Em7]amor se ganha, de [Bm7]graça o recebe\n* Coro\nEu [C2]quero conhecer [Dsus4]Jesus\nEu [Em]quero conhecer [Bm7]Jesus\nEu [C2]quero conhecer [Dsus4]Jesus\nEu [Em7]quero conhecer [D]Jesus\n([C2]e ser achado Nele)\n* Intro\n[| C2 - - - | Dsus4 - - - | Em7 - - - | Bm7 - - - |]\n* -Estrofe\n* --Coro\n* Pós-Coro\nE ser achado [C2]Ne[D]le\nE ser achado [Em]Ne[Bm7]le\nE ser achado [C2]Ne[D]le\nE ser achado [Em]Ne[D/F#]le\n* Interlúdio\n[| C - - - | - - - D | Em - - - | Bm7 - - - |]\n* Refrão\nYe[C2]shua, ah [D]ah [Em7]ah ah, ah [Bm7]ah ah ah\nYe[C2]shua, ah [D]ah [Em7]ah ah, ah [D2/F#]ah ah ah\nYe[C2]shua, ah [D]ah [Em7]ah ah, ah [D2/F#]ah ah ah\n* Bridge\nO [C2]Meu Amado é o mais [Em7]belo\nEntre mi[D/F#] - [G]lhares e [D]milhares\nO [C2]Meu Amado é o mais [Em7]belo\nEntre [G]milhares e [D]milhares\nO [C2]Meu Amado é o mais [Em7]belo\nEntre [G]milhares e [D/F#]milhares\nO [C2]Meu Amado é o mais [Em7]belo\nEntre [G]milhares e [D]milhares\nBaixar Dinâmica\n* Tag Com Yeshua\n[| C - - - | - - - D | Em - - - | D - - - ||] Várias vezes"
+    "corpo": "* Intro\n[| C2 - - - | Dsus4 - - - | Em7 - - - | D2 - - - |] 2x\n* Verso\nO meu [C]orgulho me tirou do [Dsus4]jardim\nSua [Em7]humildade colocou o jardim em [Bm7]mim\nE se eu [C]vender tudo o que tenho\nEm [Dsus4]troca do amor eu [Em7]falha[D]ria\nPois o [C]amor não se compra, nem [Dsus4]se merece\nO [Em7]amor se ganha, de [Bm7]graça o recebe\n* Coro\nEu [C2]quero conhecer [Dsus4]Jesus\nEu [Em]quero conhecer [Bm7]Jesus\nEu [C2]quero conhecer [Dsus4]Jesus\nEu [Em7]quero conhecer [D]Jesus\n([C2]e ser achado Nele)\n* Intro\n[| C2 - - - | Dsus4 - - - | Em7 - - - | Bm7 - - - |]\n* -Estrofe\n* --Coro\n* Pós-Coro\nE ser achado [C2]Ne[D]le\nE ser achado [Em]Ne[Bm7]le\nE ser achado [C2]Ne[D]le\nE ser achado [Em]Ne[D/F#]le\n* Interlúdio\n[| C - - - | - - - D | Em - - - | Bm7 - - - |]\n* Refrão\nYe[C2]shua, ah [D]ah [Em7]ah ah, ah [Bm7]ah ah ah\nYe[C2]shua, ah [D]ah [Em7]ah ah, ah [D2/F#]ah ah ah\nYe[C2]shua, ah [D]ah [Em7]ah ah, ah [D2/F#]ah ah ah\n* Bridge\nO [C2]Meu Amado é o mais [Em7]belo\nEntre mi[D/F#] - [G]lhares e [D]milhares\nO [C2]Meu Amado é o mais [Em7]belo\nEntre [G]milhares e [D]milhares\nO [C2]Meu Amado é o mais [Em7]belo\nEntre [G]milhares e [D/F#]milhares\nO [C2]Meu Amado é o mais [Em7]belo\nEntre [G]milhares e [D]milhares\n#Baixar Dinâmica\n* Tag Com Yeshua\n[| C - - - | - - - D | Em - - - | D - - - ||] Várias vezes"
   },
   "eu-me-entrego-a-ti": {
     "titulo": "Eu me entrego a Ti",
     "tomOriginal": "G",
-    "corpo": "* Coro\nEu [G]me entre[Am]go a [G/B]Ti[C]\nSe - [G/B]nhor [Am]meu [G]Deus[D/F#]\n[G]Serei sem - [Am]pre [G/B]Teu[C]\nE [G/B]só p'ra [Am]Ti eu [D/F#]quero [G]viver [Am] [G/B]\nO Teu [C]querer vem [G/B]fazer em [Em]mim\nMeu cora[C]ção pertence a [G/B]Ti\nA minha [C]vida\nEntrego em Tu - [G]as [D/F#]mão[Em]s\nSe Tu [Am]dizes eu farei\nSe Tu [G/B]mandas eu irei\nMeu [C]desejo é Te servir\nNão [G/B]importa o que vier\nSei [Am]que és fiel ó Deus\nMinha [G/B]confiança está em Ti\nMostra-me [C]o Teu caminho\nE [Dsus]nele eu Segui[D]rei"
+    "corpo": "* Coro\nEu [G]me entre[Am]go a [G/B]Ti[C]\nSe - [G/B]nhor [Am]meu [G]Deus[D/F#]\n[G]Serei sem - [Am]pre [G/B]Teu[C]\nE [G/B]só p'ra [Am]Ti eu [D/F#]quero [G]viver [Am] [G/B]\n* Verso\nO Teu [C]querer vem [G/B]fazer em [Em]mim\nMeu cora[C]ção pertence a [G/B]Ti\nA minha [C]vida\nEntrego em Tu - [G]as [D/F#]mão[Em]s\nSe Tu [Am]dizes eu farei\nSe Tu [G/B]mandas eu irei\nMeu [C]desejo é Te servir\nNão [G/B]importa o que vier\nSei [Am]que és fiel ó Deus\nMinha [G/B]confiança está em Ti\nMostra-me [C]o Teu caminho\nE [Dsus]nele eu Segui[D]rei"
   }
 }
