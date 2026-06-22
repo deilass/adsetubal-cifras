@@ -372,13 +372,11 @@
             let linhaTexto = "";
             let i = 0;
             
-            // Variáveis de controlo exato de posições visuais monoespaçadas
+            // Variáveis de controlo exato de posições visuais monoespaçadas[cite: 3]
             let posicaoVisualAcorde = 0; 
             let posicaoVisualTexto = 0;
 
-            while (i < App_Char_Length(linha)) {
-                function App_Char_Length(str) { return str.length; }
-                
+            while (i < linha.length) {
                 if (linha[i] === '[') {
                     let fim = i;
                     while (fim < linha.length && linha[fim] !== ']') {
@@ -388,7 +386,7 @@
                     let ac = linha.substring(i + 1, fim);
                     let acTransposto = transporAcorde(ac, deslocamento);
                     
-                    // Alinha adicionando espaços na linha superior até bater certo com o cursor da letra
+                    // Alinha adicionando espaços na linha superior até bater certo com o cursor da letra[cite: 3]
                     while (posicaoVisualAcorde < posicaoVisualTexto) {
                         linhaAcordes += " ";
                         posicaoVisualAcorde++;
